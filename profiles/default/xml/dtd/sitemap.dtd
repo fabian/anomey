@@ -1,0 +1,20 @@
+<!ENTITY % node
+ "id           ID     #REQUIRED
+  title        CDATA  #REQUIRED
+  description  CDATA  #IMPLIED
+  design       CDATA  #IMPLIED"
+ >
+
+<!ELEMENT site	(page)*>
+<!ELEMENT page	(page)*>
+
+<!ATTLIST site
+  %node;
+>
+	
+<!ATTLIST page
+  %node;
+  name  CDATA         #REQUIRED
+  type  CDATA         #REQUIRED
+  hide  (true|false)  #IMPLIED
+>

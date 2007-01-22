@@ -1,0 +1,21 @@
+<!ELEMENT module		(author, structure)>
+<!ELEMENT processor		(sub-processor)*>
+<!ELEMENT sub-processor	(sub-processor)*>
+	
+<!ATTLIST processor
+	class			CDATA			#REQUIRED
+	description		CDATA			#IMPLIED
+	subject			CDATA			#IMPLIED
+	creator			CDATA			#IMPLIED
+	creator-id		CDATA			#IMPLIED
+	language		CDATA			#IMPLIED
+	>
+	
+<!ATTLIST sub-processor
+	name			CDATA			#REQUIRED
+	title			CDATA			#REQUIRED
+	class			CDATA			#REQUIRED
+	menu-state		(show|hide)		#REQUIRED
+	description		CDATA			#IMPLIED
+	subject			CDATA			#IMPLIED
+	>

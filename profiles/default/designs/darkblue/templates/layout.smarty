@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+    <head>
+        <title>{$site.title} - {$page.title}</title>
+        
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <link rel="stylesheet" href="{$site.root}view/designs/darkblue/style.css" type="text/css" />
+    </head>
+<body class="blue">
+
+<h1><a href="{$site.root}">{$site.title}</a></h1>
+
+<ul>
+{foreach item=link from=$site.menu}
+{if $link.active}
+    <li class="active"><a href="{$link.href}">{$link.title}</a>
+{else}
+    <li><a href="{$link.href}">{$link.title}</a>
+{/if}
+
+{if count($link.submenu) gt 0 }
+        <ul>
+        {foreach item=sublink from=$link.submenu}
+        {if $sublink.active}
+            <li class="active"><a href="{$sublink.href}">{$sublink.title}</a>
+        {else}
+            <li><a href="{$sublink.href}">{$sublink.title}</a>
+        {/if}</li>
+        {/foreach}
+        </ul>
+{/if}</li>
+{/foreach}
+</ul>
+
+<h2>{$page.title}</h2>
+
+<div id="content">
+{include file=$main}
+</div>
+
+<p id="footer">Made by Fabian Vogler. Powered by <a href="#">anomey {$anomey.version}</a></p>
+
+</body>
+</html>

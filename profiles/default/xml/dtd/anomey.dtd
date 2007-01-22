@@ -1,0 +1,31 @@
+<!ELEMENT anomey	(page?)+>
+<!ELEMENT page		(page?, subpage?)+>
+
+<!ATTLIST anomey
+	version			CDATA			#REQUIRED
+	>
+	
+<!ATTLIST subpage
+	oid				CDATA			#REQUIRED
+	title			CDATA			#REQUIRED
+	name			CDATA			#REQUIRED
+	action			CDATA			#REQUIRED
+	>
+	
+<!ATTLIST page
+	oid				ID 				#REQUIRED
+	name			CDATA			#REQUIRED
+	title			CDATA			#REQUIRED
+	type			CDATA			#REQUIRED
+	action			CDATA			#REQUIRED
+	design 			CDATA			#IMPLIED
+	created	 		CDATA			#IMPLIED
+	modified		CDATA			#IMPLIED
+	menu-state		(show|hide)		#IMPLIED
+	description		CDATA			#IMPLIED
+	subject			CDATA			#IMPLIED
+	creator			CDATA			#IMPLIED
+	creator-id		CDATA			#IMPLIED
+	format			CDATA			#IMPLIED
+	language		CDATA			#IMPLIED
+	>

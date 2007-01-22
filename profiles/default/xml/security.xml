@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<objects nextid="62">
+  <object id="o42" class="Site">
+    <permission name="admin">
+      <group id="g1"/>
+    </permission>
+  </object>
+  <object id="o43" class="Text">
+    <permission name="view" everyone="true">
+      <user id="u1"/>
+    </permission>
+    <permission name="edit">
+      <group id="g1"/>
+    </permission>
+  </object>
+  <object id="o44" class="Text">
+    <permission name="view">
+      <group id="g1"/>
+    </permission>
+    <permission name="edit">
+      <group id="g1"/>
+    </permission>
+  </object>
+  <object id="o45" class="Text">
+    <permission name="view" everyone="true"/>
+    <permission name="edit">
+      <group id="g1"/>
+    </permission>
+  </object>
+  <object id="o46" class="Text">
+    <permission name="view" everyone="true"/>
+    <permission name="edit">
+      <user id="u1"/>
+    </permission>
+  </object>
+  <object id="o49" class="Guestbook">
+    <permission name="read" everyone="true"/>
+    <permission name="add">
+      <group id="g1"/>
+    </permission>
+    <permission name="edit">
+      <group id="g1"/>
+    </permission>
+    <permission name="delete"/>
+  </object>
+  <object id="o50" class="Gallery">
+    <permission name="read" everyone="true">
+      <user id="u3"/>
+      <group id="g1"/>
+    </permission>
+    <permission name="edit">
+      <group id="g1"/>
+    </permission>
+  </object>
+  <object id="o54" class="Text">
+    <permission name="view">
+      <user id="u1"/>
+    </permission>
+    <permission name="edit">
+      <user id="u1"/>
+    </permission>
+  </object>
+  <object id="o55" class="News">
+    <permission name="read">
+      <user id="u1"/>
+      <user id="u3"/>
+      <group id="g1"/>
+    </permission>
+    <permission name="edit">
+      <user id="u1"/>
+    </permission>
+    <permission name="delete"/>
+  </object>
+  <object id="o56" class="Gallery">
+    <permission name="read"/>
+    <permission name="edit">
+      <user id="u1"/>
+    </permission>
+  </object>
+  <object id="o57" class="Guestbook">
+    <permission name="read">
+      <user id="u1"/>
+    </permission>
+    <permission name="add">
+      <user id="u1"/>
+    </permission>
+    <permission name="edit">
+      <user id="u1"/>
+    </permission>
+    <permission name="delete">
+      <user id="u1"/>
+    </permission>
+  </object>
+  <object id="o58" class="Gallery">
+    <permission name="read">
+      <user id="u1"/>
+    </permission>
+    <permission name="edit">
+      <user id="u1"/>
+    </permission>
+  </object>
+  <object id="o59" class="People">
+    <permission name="read">
+      <user id="u1"/>
+    </permission>
+    <permission name="edit">
+      <user id="u1"/>
+    </permission>
+  </object>
+  <object id="o60" class="GoogleSitemap">
+    <permission name="edit">
+      <user id="u1"/>
+    </permission>
+  </object>
+  <object id="o61" class="GoogleSitemap">
+    <permission name="edit">
+      <user id="u1"/>
+    </permission>
+  </object>
+</objects>

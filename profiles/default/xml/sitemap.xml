@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<site id="o42" title="anomey content management">
+	<page id="o43" title="Home" type="Text" name="home" hide="false"
+		modified="2007-01-18">
+		<page id="o44" title="Test" type="Text" name="test" hide="false"
+			modified="2007-01-18" />
+	</page>
+	<page id="o50" title="Gallery" type="Gallery" name="gallery"
+		hide="false" modified="2007-01-18" />
+	<page id="o45" title="Page not found" type="Text"
+		name="page-not-found" modified="2007-01-18" />
+	<page id="o46" title="Access denied" type="Text"
+		name="access-denied" modified="2007-01-18" />
+	<page id="o49" title="Guestbook" type="Guestbook" name="guestbook"
+		hide="false" modified="2007-01-18" />
+	<page id="o55" title="News" type="News" name="news" hide="false"
+		modified="2007-01-18" />
+	<page id="o59" title="People" type="People" name="people"
+		hide="false" modified="2007-01-18" />
+	<page id="o61" title="Google Sitemap" type="GoogleSitemap"
+		name="sitemap" modified="2007-01-18" />
+</site>

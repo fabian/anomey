@@ -1,0 +1,20 @@
+anomey 2.1.0
+====================
+
+- "profile" folder moved to "profiles/default"
+- slimbox and mootools added to core
+- Atom feed in News module
+- new smarty modifier: date (wrapper of the php function date)
+- added "preface" to News module
+- added "media files" admin to News module
+- new method Processor::redirect()
+- new module: "Join", which redirects to another url
+- Bug #7 (Admin interface site permissions)
+- Bug #8 (Check PHP version)
+- added "title" and "url" to user
+- new module "People"
+- new method User::getName()
+- Site::getDesign() and Model::getDesign() return Design object
+- new module: "GoogleSitemap"
+- added Module::getModified()
+- added WebAction::getContentType()

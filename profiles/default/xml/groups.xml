@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<groups nextid="7">
+  <group id="g1" name="administrators">
+    <user>u1</user>
+    <user>u2</user>
+    <user>u3</user>
+  </group>
+</groups>

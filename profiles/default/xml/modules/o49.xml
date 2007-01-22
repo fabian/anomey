@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<guestbook>
+  <entry>
+    <name>Max Meier</name>
+    <content>Hy!</content>
+  </entry>
+  <entry>
+    <name>Fabian Vogler</name>
+    <content>Hallo!</content>
+  </entry>
+  <entry>
+    <name>Foo</name>
+    <content>Bar</content>
+  </entry>
+</guestbook>

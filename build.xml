@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<project name="anomey" default="default">
+
+	<property name="version" value="2.1.0" />
+	<property name="build" value="build" />
+	<property name="excludes" value="profiles/**, build/**, build.xml, build-anomey.launch, .project" />
+
+	<target name="init">
+		<mkdir dir="${build}" />
+	</target>
+
+	<target name="default" depends="init">
+		<zip destfile="${build}/anomey-${version}.zip">
+			<zipfileset dir="." prefix="anomey" excludes="${excludes}" />
+		</zip>
+		<tar destfile="${build}/anomey-${version}.tar.gz" compression="gzip">
+			<tarfileset dir="." prefix="anomey" excludes="${excludes}" />
+		</tar>
+	</target>
+
+	<target name="cleanup">
+		<delete dir="${build}" />
+	</target>
+</project>

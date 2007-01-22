@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<site>
+  <specialTrails>
+    <home>/home</home>
+    <accessDenied>/access-denied</accessDenied>
+    <pageNotFound>/page-not-found</pageNotFound>
+  </specialTrails>
+</site>

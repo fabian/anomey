@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<users nextid="6">
+  <user id="u1" nick="fabian" password="644850cb8939d255ed752957b7c4458c52900f75" prename="Fabian" lastname="Vogler" title="Head developer" url="http://fabian.ap04a.ch/" mail="fabian.vogler@gmail.com"/>
+  <user id="u2" nick="cyril" password="445e795a5bd4078e4c79dd991c089965ec96cb56" prename="Cyril" lastname="Gabathuler" title="Associate developer" url="http://gabathuler.de/" mail="cyril.gabathuler@gmail.com"/>
+  <user id="u3" nick="adi" password="0f0fc8a1205cdda2b6da1545c6a9990797a5f0be" prename="Adrian" lastname="Egloff" title="Associate developer" url="http://adi.homelinux.org/" mail="adrian.egloff@gmail.com"/>
+</users>

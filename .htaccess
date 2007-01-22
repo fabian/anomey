@@ -1,0 +1,18 @@
+##################################################
+# Enable mod_rewrite in apache to use nice urls.
+#
+# If you are using Apache Alias, then provide
+# with RewriteBase the path to anomey.
+# e.g. if the url to the index.php is
+# http://example.org/cms/anomey/index.php
+# then set this: RewriteBase /cms/anomey
+##################################################
+
+<IfModule mod_rewrite.c>
+    RewriteEngine on
+#   RewriteBase /cms/anomey
+    RewriteCond %{SCRIPT_FILENAME} !-f
+    RewriteRule ^(.*)$ rewrite.php/$1
+</IfModule>
+
+DirectoryIndex index.php

@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+<news nextid="12">
+  <entry>
+    <id>e11</id>
+    <title>Test</title>
+    <content>Foobar</content>
+    <publication>2006-11-14T08:51:00+01:00</publication>
+    <author>u1</author>
+  </entry>
+  <entry>
+    <id>e7</id>
+    <title>Foobar</title>
+    <content>Zweiter Eintrag.</content>
+    <publication>2006-11-11T02:02:00+01:00</publication>
+    <author>u1</author>
+  </entry>
+  <entry>
+    <id>e8</id>
+    <title>Erster Eintrag</title>
+    <content>Oder so..</content>
+    <publication>2002-11-11T02:06:00+01:00</publication>
+    <author>u1</author>
+  </entry>
+  <entry>
+    <id>e10</id>
+    <title>Foo</title>
+    <content>Hallo [Link to home](page:/home).</content>
+    <publication>2001-11-11T14:33:00+01:00</publication>
+    <author>u1</author>
+  </entry>
+</news>

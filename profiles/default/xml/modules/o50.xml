@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<module>
+  <settings cols="4" rows="4" nextid="124">
+    <thumb height="100" width="100" crop="true"/>
+    <image height="600" width="800" crop="false"/>
+  </settings>
+  <imports>
+    <import class="Picasa" item="10" rss="http://picasaweb.google.com/lh/rssAlbum?uname=adrian.egloff&amp;aid=4984938126230224913"/>
+    <import class="Flickr" item="11" photoset="72157594335647157"/>
+  </imports>
+  <item class="Gallery" title="Gallery">
+    <item class="Gallery" id="10" title="Picasa Testgallery">
+      <item class="Image" id="119" source="http://lh4.google.com/adrian.egloff/RS4PYNBhABI/AAAAAAAAAGA/proLiY57BF4/tmp7c667dcc.tmp.JPG"/>
+      <item class="Image" id="120" source="http://lh6.google.com/adrian.egloff/RS4PaaG6ABI/AAAAAAAAAIE/YPW__QJ6jgg/tmp32c591e8.tmp.JPG"/>
+      <item class="Image" id="121" source="http://lh6.google.com/adrian.egloff/RS4Pbh4JABI/AAAAAAAAAGo/FTMHZqb3IxY/tmp8ba2ca5.tmp.JPG"/>
+      <item class="Image" id="122" source="http://lh3.google.com/adrian.egloff/RS4PcXPvABI/AAAAAAAAAGw/1kZf7DhozCc/tmp61539e72.tmp.JPG"/>
+      <item class="Image" id="123" source="http://lh5.google.com/adrian.egloff/RS4PgIeWABI/AAAAAAAAAHg/94gkPp7AsD0/tmp50d8e849.tmp.JPG"/>
+    </item>
+    <item class="Gallery" id="11" title="Flickr Testgallery">
+      <item class="Image" id="105" source="http://static.flickr.com/82/273946236_91073ad5d0.jpg"/>
+      <item class="Image" id="106" source="http://static.flickr.com/91/273946239_8a9923d0e6.jpg"/>
+      <item class="Image" id="107" source="http://static.flickr.com/106/273946241_75e6f18a64.jpg"/>
+      <item class="Image" id="108" source="http://static.flickr.com/91/273946244_9ac9efe043.jpg"/>
+    </item>
+  </item>
+</module>

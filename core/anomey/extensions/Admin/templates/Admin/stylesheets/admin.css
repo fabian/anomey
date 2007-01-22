@@ -1,0 +1,623 @@
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	background-color: #494947;
+	font-size: 101%;
+}
+
+a {
+	color: #2476B3;
+}
+
+a:focus,a:hover {
+	color: #298BD0;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+}
+
+img {
+	border: none;
+}
+
+#container {
+	width: 48em;
+	margin: 0 auto;
+	background-color: white;
+}
+
+#header {
+	background-image: url(../images/header.jpg);
+	border-bottom: 0.3em solid #efefef;
+	float: left;
+	background-color: #d28324;
+}
+
+#header ul {
+	list-style-type: none;
+}
+
+#logo {
+	text-align: right;
+	font-size: 2em;
+	font-family: Garamond, Georgia, "New York", serif;
+	font-weight: bold;
+	color: #ededed;
+	padding: 0.5em;
+	padding-bottom: 1em;
+}
+
+#logo em {
+	font-style: normal;
+	color: white;
+}
+
+#userInfo {
+	float: right;
+	margin-right: 0.5em;
+}
+
+#userInfo a {
+	color: white;
+}
+
+#userInfo a:hover {
+	text-decoration: none;
+}
+
+#userInfo .username {
+	
+}
+
+#userInfo li {
+	float: left;
+	color: white;
+	padding: 0.6em 1.8em;
+	display: block;
+	background-color: #494947;
+	font-size: 0.7em;
+}
+
+#userInfo li.first {
+	padding-right: 0.4em;
+}
+
+#userInfo li.first:after {
+	content: " |";
+}
+
+#userInfo li.last {
+	padding-left: 0;
+}
+
+#userInfo li.last span {
+	padding-left: 0.5em;
+	border-left: 1px solid white;
+}
+
+.navigation {
+	display: block;
+	float: left;
+}
+
+.navigation li {
+	float: left;
+	display: block;
+	margin-left: 0.5em;
+}
+
+.navigation li a,
+.navigation li span {
+	color: black;
+	background-color: #d0d0d0;
+	padding: 0.6em 1.5em;
+	display: block;
+	font-size: 0.7em;
+	text-decoration: none;
+}
+
+.navigation li .active,
+.navigation li a:hover.active {
+	background-color: #efefef;
+}
+
+.navigation li .active strong {
+	font-weight: normal;	
+}
+
+.navigation li a:hover {
+	background-color: #c0c0c0;
+	color: black;
+}
+
+#navigation {
+	float: left;
+	width: 60%;
+}
+
+#middle {
+	clear: both;
+	padding-top: 0.4em;	
+	background-color: #efefef;
+}
+
+#pageNavigation {
+	padding-left: 0.5em;
+	width: 47.5em;
+	clear: both;
+	background-color: #efefef;
+}
+
+#pageNavigation.navigation li a {
+	background-color: #d5d5d5;
+}
+
+#pageNavigation.navigation li a:hover {
+	background-color: #c5c5c5;
+}
+
+#pageNavigation.navigation li a.active,
+#pageNavigation.navigation li a.active:hover {
+	background-color: white;
+}
+
+#middle h1 {
+	font-size: 0.8em;
+	background-color: #efefef;
+	padding: 0.8em 1.2em;
+	clear: both;
+	padding-top: 0em;
+}
+
+#content {
+	margin: 1.3em;
+	margin-top: 0;
+	clear: both;
+	font-size: 0.7em;
+	padding-top: 1.6em;
+}
+
+#content h1,
+#content h2 {
+	font-size: 1.1em;
+	margin-bottom: 1em;
+	float: left;
+}
+
+#actions {
+	padding: 0.5em;
+	margin: 0 1em;
+	float: right;
+	margin-top: 1.2em;
+}
+
+#actions li {
+	list-style-type: none;
+	display: inline;
+}
+
+#content p {
+	margin-bottom: 1em;
+	line-height: 1.5em;
+}
+
+#content ul {
+	margin-left: 1.5em;
+	margin-bottom: 0.8em;
+}
+
+#content hr {
+    height: 1px;
+    background-color: #888;
+    margin-bottom: 1em;
+    border: 0;
+}
+
+#content #overview {
+    clear: both;
+}
+
+#footer {
+	clear: both;
+	padding: 1em;
+	text-align: right;
+	font-size: 0.7em;
+}
+
+table {
+	border-collapse: collapse;
+	width: 100%;
+	clear: both;
+	margin-bottom: 2em;
+}
+
+table td,table th {
+	padding: 0.6em 0.6em;
+	border-bottom: 1px solid #c6c6c6;
+	text-align: left;
+}
+
+table th {
+	background-color: #D9D7D1;
+}
+
+table td.subtable {
+	padding: 0;
+}
+
+table td.subtable td,
+table td.subtable th {
+	border-bottom: 0;
+}
+
+table td.subtable td {
+	border-top: 1px solid #c6c6c6;
+	background-color: #F1F0ED;
+}
+
+table td.state {
+	padding: 0.3em 0 0 0em;
+	text-align: center;
+}
+
+table .even td,
+table .permission td {
+	background-color: #F1F0ED;
+}
+
+table .page td {
+	background-color: white;
+}
+
+table .page td.state {
+	padding: 0.6em 0.6em;
+	text-align: left;
+}
+
+table .permission td.state {
+	text-align: right;
+}
+
+table .deep0 td {
+	background-color: white;
+}
+
+table .deep1 td {
+	background-color: #f2f1ed;
+}
+
+table .deep2 td {
+	background-color: #e5e4e1;
+}
+
+table .deep3 td {
+	background-color: #d9d8d4;
+}
+
+table .deep4 td {
+	background-color: #cccbc8;
+}
+
+table .deep5 td {
+	background-color: #bfbebb;
+}
+
+table .deep6 td {
+	background-color: #b3b2af;
+}
+
+table .deep7 td {
+	background-color: #a6a5a2;
+}
+
+table .deep8 td {
+	background-color: #999896;
+}
+
+table .deep9 td {
+	background-color: #8c8c89;
+}
+
+table ul {
+	display: inline;
+}
+
+table ul li {
+	list-style-type: none;
+	display: inline;
+}
+
+a.action {
+	background-repeat: no-repeat;
+	background-position: 0.1em center;
+	padding: 0.15em 0.5em 0.15em 1.8em;
+}
+
+a.action span.detail {
+	display: none;
+}
+
+a.action.edit {
+	background-image: url("../images/icons/pencil.png");
+}
+
+a.action.delete {
+	background-image: url("../images/icons/delete.png");
+}
+
+a.action.add_page {
+	background-image: url("../images/icons/page_add.png");
+}
+
+a.action.cancel {
+	background-image: url("../images/icons/cancel.png");
+}
+
+a.action.return {
+	background-image: url("../images/icons/arrow_left.png");
+}
+
+a.action.config {
+	background-image: url("../images/icons/cog_edit.png");
+}
+
+a.action.add_entry {
+	background-image: url("../images/icons/newspaper_add.png");
+}
+
+a.action.add_file {
+	background-image: url("../images/icons/page_white_add.png");
+}
+
+a.action.add_group {
+	background-image: url("../images/icons/group_add.png");
+}
+
+a.action.add_user {
+	background-image: url("../images/icons/user_add.png");
+}
+
+a.action.move_up {
+	background-image: url("../images/icons/arrow_new_up.png");
+}
+
+a.action.move_down {
+	background-image: url("../images/icons/arrow_new_down.png");
+}
+
+a.action.add_permission {
+	background-image: url("../images/icons/key_add.png");
+}
+
+a.action.add_design {
+	background-image: url("../images/icons/layout_add.png");
+}
+
+a.action.add_user_permission {
+	background-image: url("icons/user_key.png");
+}
+
+a.action.add_group_permission {
+	background-image: url("icons/group_key.png");
+}
+
+#messages {
+	padding-left: 0;
+	clear: both;
+}
+
+#messages img {
+	vertical-align: text-top;
+	margin-right: 0.2em;
+}
+
+#messages li {
+	list-style-type: none;
+	padding-bottom: 0.5em;
+}
+
+form {
+	clear: both;
+	margin-bottom: 1.5em;	
+}
+
+fieldset {
+	border: 0;
+	padding: 0;
+	margin-bottom: 2em;
+	display: block;
+	background-color: #f1f0ed;
+	padding-bottom: 0.5em;
+}
+
+fieldset p {
+	padding-left: 0.5em;
+}
+
+fieldset label span.required {
+	color: #2476B3;
+	cursor: help;
+}
+
+fieldset legend span {
+	display: block;
+	padding: 0.4em 0.6em;
+	width: 64.75em;
+	background-color: #dad9d7;
+	font-weight: bold;
+	border-bottom: 1px solid #C6C6C6;
+}
+
+/* ie hack */
+* html fieldset legend span {
+	margin-left: -0.6em;
+	position: relative;
+	width: 64em;
+}
+
+fieldset div.text,
+fieldset div.select,
+fieldset div.multiple,
+fieldset div.checkbox,
+fieldset div.file,
+fieldset div.datetime,
+fieldset div.radio {
+	position: relative;
+	height: 1.8em;
+	padding-top: 1em;
+	width: 32.8em;
+	float: left;
+}
+
+fieldset div.text.odd,
+fieldset div.select.odd,
+fieldset div.datetime.odd,
+fieldset div.multiple.odd,
+fieldset div.checkbox.odd,
+fieldset div.file.odd,
+fieldset div.datetime.odd,
+fieldset div.radio.odd {
+	border-left: 1px solid #C6C6C6;
+}
+
+fieldset div.text.last,
+fieldset div.select.last,
+fieldset div.datetime.last,
+fieldset div.multiple.last,
+fieldset div.checkbox.last,
+fieldset div.file.last,
+fieldset div.datetime.last,
+fieldset div.radio.last {
+	padding-bottom: 0.5em;
+}
+
+fieldset div.text label,
+fieldset div.select label,
+fieldset div.datetime label,
+fieldset div.multiple label,
+fieldset div.checkbox label,
+fieldset div.file label,
+fieldset div.datetime label,
+fieldset div.radio label {
+	text-align: left;
+	width: 9.5em;
+	padding-left: 1em;
+	display: block;
+}
+
+fieldset div.radio label {
+    float: left;
+    width: auto;
+    margin-top: 0.3em;
+    padding-left: 0.2em;
+    padding-right: 1em;
+}
+
+fieldset div.multiple {
+	height: 6.5em;	
+}
+
+fieldset div input,
+fieldset div select,
+fieldset div .datetime_select {
+	position: absolute;
+	left: 10em;
+	top: 0.25em;
+	width: 21em;
+}
+
+fieldset div.checkbox input {
+	position: absolute;
+	left: 10em;
+	top: 0.5em;
+	width: auto;
+}
+
+fieldset div.radio input {
+	display: block;
+	float: left;
+    position: static;
+    left: auto;
+	top: auto;
+	width: auto;
+	margin-left: 1em;
+}
+
+fieldset div.html {
+	padding-top: 0.3em;
+}
+
+fieldset div.html textarea {
+	width: 64em;
+}
+
+fieldset div select,
+fieldset div.datetime_select {
+	width: 21.5em;
+	margin: 0.7em 0.5em;
+}
+
+fieldset div.datetime_select {
+	width: auto;
+	margin-top: 0.6em;
+}
+
+fieldset div.datetime_select select {
+	position: static;
+	width: auto;
+	margin: 0;
+}
+
+fieldset input,
+fieldset textarea,
+fieldset select {
+	font-family: Verdana;
+	margin: 0.5em;
+	font-size: 1em;
+}
+
+fieldset input,
+fieldset textarea {
+	padding: 0.2em;
+	border: 1px solid;
+	border-color: #4F4F4F #cfcfcf #cfcfcf #4F4F4F;
+	background-color: white;
+}
+
+fieldset textarea.code {
+	white-space: nowrap;
+	font-family: "Courier New", courier, monospace;
+}
+
+fieldset input:focus,fieldset textarea:focus {
+	border-color: #cfcfcf;
+}
+
+input.submit,
+input.cancel {
+	font-family: Verdana;
+	font-size: 1em;
+}
+
+input.submit {
+    font-weight: bold;
+}
+
+ul.list li {
+	list-style-type: none;
+}
+
+ul.list li span.item {
+	display: block;
+	height: 2.2em;
+}
+
+
+
+
+
+
+
+
+

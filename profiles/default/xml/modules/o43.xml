@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<page>
+  <content>Hello world!&#xD;
+&#xD;
+![anomey screenshot](media:anomey-screenshot-pages.png)&#xD;
+&#xD;
+[Relative link to page](page:test)&#xD;
+&#xD;
+[Absolute link to page](page:/home/test)</content>
+</page>

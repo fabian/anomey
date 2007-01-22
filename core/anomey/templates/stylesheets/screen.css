@@ -1,0 +1,106 @@
+body {
+    font-family: Verdana, sans-serif;
+    margin: 0;
+    font-size: 0.8em;
+    padding: 0;
+}
+
+#logo {
+    background: #4b4b4b url(../images/head.png) repeat-x bottom;
+    margin: 0;
+    padding: 1em 1em 1.4em;
+    color: white;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+#logo a {
+    color: white;
+    text-decoration: none;
+}
+
+#header, #content {
+    padding: 0 1.3em;
+}
+
+#content {
+    padding-bottom: 1em;
+}
+
+h1, h2 {
+ font-family: "Trebuchet MS", sans-serif;
+ color: #f1730d;
+}
+
+h2, h3 {
+ color: #214e80;
+}
+
+table {
+	border: 1px solid #333;
+	border-collapse: collapse;
+}
+
+th {
+	background-color: #4b4b4b;
+	color: white;
+	padding: 0.4em 1em;
+}
+
+td {
+	padding: 0.3em 0.7em;
+	border-top: 1px solid #333;
+	border-right: 1px solid #333;
+}
+
+table .even td {
+	background-color: #F5F5F5;
+}
+
+a {
+ color: #0a5493;
+}
+
+a:hover {
+ color: #1c75b3;
+}
+
+a img {
+ border: 0;	
+}
+
+ul {
+ list-style-type: square;
+}
+
+ul.box {
+ list-style-type: none;
+ margin: 0;
+ padding: 0;
+ overflow: hidden;
+ width: 100%;
+}
+
+li.item {
+ float: left;
+}
+
+li.item a {
+ display: block;
+ text-decoration: none;
+ padding: 10px;
+ margin: 10px 15px 15px 0;
+ background-color: #EEE;
+}
+
+li.item img {
+	vertical-align: middle;
+}
+
+.message {
+ list-style-type: disc;
+}
+
+.message.error {
+ color: #db0c0c;
+}
