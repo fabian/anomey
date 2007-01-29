@@ -26,10 +26,47 @@
  * or visit http://www.gnu.org/copyleft/gpl.html.
  */
 
-class AdminDesignsAction extends AdminBaseAction {
+class AdminDesignsAction extends AdminBaseAction implements ActionContainer {
+
+	public static function getActions() {
+		return array(
+			'edit' => 'AdminEditDesignAction'
+		);
+	}
+
 	public function execute() {
 		$this->getDesign()->assign('designs', $this->getModel()->getDesigns());
 		$this->getDesign()->display('Admin/designs.tpl');
+	}
+}
+
+class AdminEditDesignAction extends AdminBaseAction implements ActionContainer {
+
+	public static function getActions() {
+		return array(
+			'files' => 'AdminEditDesignFilesAction'
+		);
+	}
+	
+	public function execute() {
+		$this->forward('/admin/designs/edit/files/' . $this->getRequest()->getParameter(1));
+	}
+}
+
+class AdminEditDesignFilesAction extends AdminBaseAction {
+	public function execute() {
+		$files = array();		
+
+		$path = $this->getSecurity()->getProfile() . '/designs/darkblue/templates';
+		foreach (scandir($path) as $name) {
+			if(is_file($path . '/'. $name)) {
+				$files[] = $name;
+			}
+		}
+
+
+		$this->getDesign()->assign('files', $files);
+		$this->getDesign()->display('Admin/design.tpl');
 	}
 }
 
