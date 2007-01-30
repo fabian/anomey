@@ -27,6 +27,7 @@
  */
 
 require_once 'security.package.php';
+require_once 'error.package.php';
 
 class PageNotFoundException extends Exception {
 

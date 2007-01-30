@@ -201,7 +201,7 @@ class DefaultAdminAction extends AbstractDefaultAdminFormAction implements Prote
 
 	public function save(Form $form) {
 		$this->getModel()->store(XML :: import(HTML :: decodeSpecialchars($form->contentOfPage)));
-		$this->getModel()->setChangedNow();
+		$this->getModel()->setModifiedNow();
 
 		return new Message('Changes saved!');
 	}

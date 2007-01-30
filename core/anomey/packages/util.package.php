@@ -54,6 +54,33 @@ abstract class Bean implements ArrayAccess {
 	}
 }
 
+class Configuration {
+	
+	private $values = array();
+	
+	public static function load($file) {
+		$config = new Configuration();
+		$config->setValues(parse_ini_file($file));
+		return $config;
+	}
+	
+	private function __get($key) {
+       if (isset($this->values[$key])) {
+           return $this->values[$key];
+       } else {
+           return '';
+       }
+	}
+
+	private function __set($key, $value) {
+		$this->values[$key] = $value;
+	}
+
+	public function setValues($values) {
+		$this->values = $values;
+	}
+}
+
 class File extends Bean {
 	private $name;
 	

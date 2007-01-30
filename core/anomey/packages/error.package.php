@@ -26,20 +26,25 @@
  * or visit http://www.gnu.org/copyleft/gpl.html.
  */
 
-class GlobalException extends Exception {
-	public static function handle($severity, $message, $file, $line) {
-		if (error_reporting() != 0) {
+class ErrorHandler {
+	
+	private $debug;
+
+	public function __construct($debug) {
+		$this->debug = $debug;
+	}
+
+	public function handle($severity, $message, $file, $line) {
+		if (error_reporting() != 0 and $this->debug) {
 			if(!(E_NOTICE & $severity)) {
 				// ignore
 			} elseif(!(E_WARNING & $severity)) {
 				echo '<br/><strong>Warning:</strong> ' . $message . ' <em>in file ' . $file . ':' . $line . '</em>';
 			} else {
-				throw new self($message, $severity);
+				throw new ErrorException($message, 0, $severity, $file, $line);
 			}
 		}
 	}
 }
-
-set_error_handler(array('GlobalException', 'handle'));
 
 ?>
