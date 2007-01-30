@@ -31,17 +31,21 @@ class Controller {
 	const profiles = 'profiles';
 	
 	public static function handle($base = '') {
-		// Create profiles folder.
-		if(!self :: createFolder(self :: profiles)) {
-			exit('Could not create folder <em>' . self :: profiles . '</em> inside the anomey folder!');
-		}
-		
-		$host = $_SERVER['HTTP_HOST'];
-		
-		if(file_exists(self :: profiles . '/' . $host)) {
-			new self(self :: profiles . '/' . $host, $base);
-		} else {
-			new self(self :: profiles . '/default', $base);
+		try {
+			// Create profiles folder.
+			if(!self :: createFolder(self :: profiles)) {
+				exit('Could not create folder <em>' . self :: profiles . '</em> inside the anomey folder!');
+			}
+			
+			$host = $_SERVER['HTTP_HOST'];
+			
+			if(file_exists(self :: profiles . '/' . $host)) {
+				new self(self :: profiles . '/' . $host, $base);
+			} else {
+				new self(self :: profiles . '/default', $base);
+			}
+		} catch (GlobalException $e) {
+			include 'error.view.php';
 		}
 	}
 	
