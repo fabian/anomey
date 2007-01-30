@@ -9,7 +9,7 @@
 {foreach from=$publication item=entry}
 <h2>{$entry.title}</h2>
 {$entry.content|anomey}
-<p class="detail">Published on {$entry.publication|date_format:"%Y-%m-%d"} by {if $entry.author.nick}{$entry.author.nick}{else}unknown{/if}</p>
+<p class="minor"><em>Published on {$entry.publication|date_format:"%Y-%m-%d"} by {if $entry.author.nick}{$entry.author.nick}{else}unknown{/if}</em></p>
 {/foreach}
 {/foreach}
 {/layout}
