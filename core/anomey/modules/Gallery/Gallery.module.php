@@ -461,7 +461,7 @@ abstract class Import extends Bean{
 			return null;
 	}
 	
-	public abstract function import();
+	public abstract function doit();
 	
 	public function getClass(){
 		return $this->class;

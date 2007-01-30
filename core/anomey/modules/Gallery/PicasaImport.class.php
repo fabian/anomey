@@ -45,7 +45,7 @@ class PicasaImport extends Import {
 		$this->rss = (string) $sxml['rss'];
 	}
 	
-	public function import(){
+	public function doit(){
 		
 		$root = $this->module->getRoot();
 		if(!isset($root))
