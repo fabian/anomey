@@ -115,6 +115,10 @@ abstract class Composite extends Component {
 		return $this->children;
 	}
 	
+	public function getChildrenSize(){
+		return count($this->children);
+	}
+	
 	public function searchItem($parameter){
 		if(isset($parameter['id']) && $this->id == $parameter['id']){
 			return $this;

@@ -29,40 +29,40 @@ body {
 
 h1, h2 {
  font-family: "Trebuchet MS", sans-serif;
- color: #f1730d;
+ color: #204A87;
 }
 
 h2, h3 {
- color: #214e80;
+ color: #3465A4;
 }
 
 table {
-	border: 1px solid #333;
+	border: 1px solid black;
 	border-collapse: collapse;
 }
 
 th {
-	background-color: #4b4b4b;
+	background-color: #2E3436;
 	color: white;
 	padding: 0.4em 1em;
 }
 
 td {
 	padding: 0.3em 0.7em;
-	border-top: 1px solid #333;
-	border-right: 1px solid #333;
+	border-top: 1px solid black;
+	border-right: 1px solid black;
 }
 
 table .even td {
-	background-color: #F5F5F5;
+	background-color: #EEEEEC;
 }
 
 a {
- color: #0a5493;
+ color: #204A87;
 }
 
 a:hover {
- color: #1c75b3;
+ color: #3465A4;
 }
 
 a img {
@@ -81,20 +81,35 @@ ul.box {
  width: 100%;
 }
 
-li.item {
+ul.box li {
  float: left;
 }
 
-li.item a {
+.item {
  display: block;
- text-decoration: none;
  padding: 10px;
  margin: 10px 15px 15px 0;
- background-color: #EEE;
+ background-color: #EEEEEC;
+ -moz-border-radius: 7px;
+ border: 1px solid #D3D7CF;
+ float: left;
 }
 
-li.item img {
-	vertical-align: middle;
+.item img {
+ vertical-align: middle;
+}
+
+.detail {
+ padding: 20px 30px 10px 10px;
+}
+
+.title {
+ font-weight: bold;
+ font-size: 1.1em;
+}
+
+.minor {
+ color: #555753;	
 }
 
 .message {

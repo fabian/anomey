@@ -15,17 +15,23 @@
 {if $gallery.children}
 <ul class="box">
 {foreach name=items from=$gallery.children item=item}
-	<li class="item">
+	<li>
 		{if $item.class == "Image"}
-			<a href="{$item.item}" rel="lightbox[{$gallery.id}]"><img src="{$item.thumb}" /></a>
+			<a href="{$item.item}" rel="lightbox[{$gallery.id}]" class="item"><img src="{$item.thumb}" /></a>
 		{elseif $item.class == "Gallery"}
-			{link trail="" id=$item.id}<a href="{$href}"><img src="{$item.thumb}" /> {$item.title}</a>{/link}
+			{link trail="" id=$item.id}<a href="{$href}" class="item"><img src="{$item.thumb}" /></a>
+			<div class="detail">
+				<a href="{$href}" class="title">{$item.title}</a>
+				<p class="minor">{$item.childrenSize} Pictures</p>
+			</div>
+			{/link}
 		{/if}
 	</li>
+{foreachelse}
+	<li>Nothing found.</li>
 {/foreach}
 </ul>
 
-<p>If you don't see any pictures go to the admin-panel and import the photos of the flickr and picasa testgalleries.</p>
 {/if}
 
 {/layout}
