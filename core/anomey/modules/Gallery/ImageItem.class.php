@@ -28,37 +28,81 @@
 
 class ImageItem extends Leaf {
 	protected $source;
+	protected $type;
+	
+	protected $thumb;
+	protected $image;
 	
 	public function __construct($module, $parent, SimpleXMLElement $sxml){
 		parent::__construct($module, $parent, $sxml);
 		
 		$this->source = (string) $this->sxml['source'];
+		$this->type = (string) $this->sxml['type'];
+		
+		if($this->type == ""){
+			$image_info = getimagesize($this->source);
+			if(!$image_info){
+				throw new ImportException("Could not load image.");
+			}
+			switch ($image_info['mime']) {
+				case 'image/gif':
+					$this->type = 'gif';
+					break;
+				case 'image/jpeg':
+					$this->type = 'jpeg';
+					break;
+				case 'image/png':
+					$this->type = 'png';
+					break;
+				default:
+					throw new ImportException("Unknown image format.");
+			}
+		}
+	}
+	
+	public function setType($type){
+		$this->type = $type;
+	}
+	
+	public function getType(){
+		return $this->type;
 	}
 	
 	public function getSource(){
 		return $this->source;
 	}
 	
+	public function getCache($settings){
+		$storage = $this->module->getStorage();
+		return $storage['cache'].$this->getHash($settings);
+	}
+	
 	public function getItem(){
-		$settings = $this->module->getSettings()->getImageSettings();
-		return $this->getImage($settings);
+		return $this->getImage($this->module->getSettings()->getImageSettings());
 	}
 	
 	public function getThumb(){
-		$settings = $this->module->getSettings()->getThumbSettings();
-		return $this->getImage($settings);
+		return $this->getImage($this->module->getSettings()->getThumbSettings());
+	}
+	
+	private function getHash($settings){
+		return $this->class.'__'.$this->id.'__'.$settings['width'].'x'.$settings['height'].'__CROP'.($settings['crop']?'true':'false').'.'.$this->type;
 	}
 	
 	private function getImage($settings){
 		$storage = $this->module->getStorage();
-		$filename = $this->class.'__'.$this->id.'__'.$settings['width'].'x'.$settings['height'].'__CROP'.($settings['crop']?'true':'false');
+		$filename = $this->getHash($settings);
 		$cache = $storage['cache'].$filename;
 		$web = $storage['web'].$filename;
 		
 		if(!file_exists($cache)){
-			$resized = $this->module->resizeImage($this->source, $settings);
-			if($resized != null)
-				imagejpeg($resized, $cache);
+			try {
+				$this->module->prepareImage($this, $settings);
+			}
+			catch (ImportException $e){
+				$this->source = $this->module->getDefaultImage();
+				$this->module->prepareImage($this, $settings);
+			} 
 		}
 		
 		return $web;
@@ -68,6 +112,7 @@ class ImageItem extends Leaf {
 		$image = parent::saveItem($sxml);
 		
 		$image->addAttribute('source', $this->source);
+		$image->addAttribute('type', $this->type);
 		
 		return $image;
 	}

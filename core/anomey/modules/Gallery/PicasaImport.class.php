@@ -61,7 +61,6 @@ class PicasaImport extends Import {
 	}
 	
 	private function importItem($item, $rss){
-		
 		$file = file_get_contents($rss);
 		if(!$file)
 			throw new ImportException("There was an error while importing the sourcefile.");
@@ -78,10 +77,10 @@ class PicasaImport extends Import {
 		}
 		
 		switch($category){
-			case 'user':
+			case 'User':
 				$this->importUser($item, $channel);
 				break;
-			case 'album':
+			case 'Album':
 				$this->importAlbum($item, $channel);
 				break;
 			default:
@@ -161,15 +160,17 @@ class PicasaPhotoItem extends ImageItem {
 	*/
 	
 	public function __construct($module, $parent, SimpleXMLElement $item){
+		/*
 		if(isset($item->description))
 			$html = (string) $item->description;
 		else
 			$html = (string) $item->summary;
 		$from = strpos($html, '" src="') + 7; // cut " src=" away
-		$to = strpos($html, '" alt="') - 11; // cut ...=288 away
+		*/
+		$url = $item->enclosure['url'];
+		$to = strpos($url, '" alt="') - 11; // cut ...=288 away
 		
-		$this->source = substr($html, $from, $to - $from);
-		
+		$this->source = substr($url, 0, $to);
 
 		$this->module = $module;
 		$this->parent = $parent;

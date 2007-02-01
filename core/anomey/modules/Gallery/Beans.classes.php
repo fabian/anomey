@@ -1,5 +1,138 @@
 <?php
 
+class Settings extends Bean {
+	private $cols;
+	private $rows;
+	private $nextid;
+	private $thumb;
+	private $image;
+	
+	public function __construct($sxml) {
+		$this->cols = (int) $sxml['cols'];
+		$this->rows = (int) $sxml['rows'];
+		$this->nextid = (int) $sxml['nextid'];
+		$this->thumb = array(	'width' => (int) $sxml->thumb[0]['width'], 
+								'height' => (int) $sxml->thumb[0]['height'], 
+								'crop' => (string) $sxml->thumb[0]['crop'] == 'false' ? false : true
+							);
+		$this->image = array(	'width' => (int) $sxml->image[0]['width'], 
+								'height' => (int) $sxml->image[0]['height'], 
+								'crop' => (string) $sxml->image[0]['crop'] == 'false' ? false : true
+							);
+	}
+	
+	public function getFolder() {
+		return $this->folder;
+	}
+	
+	public function getCols() {
+		return $this->cols;
+	}
+	
+	public function getRows() {
+		return $this->rows;
+	}
+	
+	public function setCols($cols) {
+		$this->cols = $cols;
+	}
+	
+	public function setRows($rows) {
+		$this->rows = $rows;
+	}
+	
+	public function getThumbSettings() {
+		return $this->thumb;
+	}
+	
+	public function getImageSettings() {
+		return $this->image;
+	}
+	
+	public function setThumbSettings($thumb) {
+		$this->thumb = $thumb;
+	}
+	
+	public function setImageSettings($image) {
+		$this->image = $image;
+	}
+	
+	public function getNextId() {
+		return $this->nextid++;
+	}
+	
+	public function saveSettings(SimpleXmlElement $sxml){
+		$settings = $sxml->addChild('settings');
+		$settings->addAttribute('cols', $this->cols);
+		$settings->addAttribute('rows', $this->rows);
+		$settings->addAttribute('nextid', $this->nextid);
+		$thumb = $settings->addChild('thumb');
+		$thumb->addAttribute('height', $this->thumb['height']);
+		$thumb->addAttribute('width', $this->thumb['width']);
+		$thumb->addAttribute('crop', ($this->thumb['crop'] ? 'true' : 'false'));
+		$image = $settings->addChild('image');
+		$image->addAttribute('height', $this->image['height']);
+		$image->addAttribute('width', $this->image['width']);
+		$image->addAttribute('crop', ($this->image['crop'] ? 'true' : 'false'));
+	}
+}
+
+class State extends Bean {
+	public $formats = array();
+	public $tools = array();
+	
+	public function getTools(){
+		return $this->tools;
+	}
+	
+	public function getFormats(){
+		return $this->formats;
+	}
+	
+}
+
+abstract class Import extends Bean{
+	protected $class;
+	protected $item;
+	protected $itemid;
+	protected $module;
+	
+	public function __construct($sxml, $module) {
+		$this->class = (string) $sxml['class'];
+		$this->itemid = (int) $sxml['item'];
+		$this->module = $module;
+		
+		$root = $module->getRoot();
+		if(isset($root))
+			$this->item = $root->searchItem(array('id' => $this->itemid));
+		
+		if($this->item == null)
+			return null;
+	}
+	
+	public abstract function doit();
+	
+	public function getClass(){
+		return $this->class;
+	}
+	
+	public function getItem(){
+		return $this->item;
+	}
+		
+	public function getItemId(){
+		return $this->itemid;
+	}
+	
+	public function saveImport(SimpleXmlElement $sxml){
+		$import = $sxml->addChild('import');
+		$import->addAttribute('class', $this->class);
+		$import->addAttribute('item', $this->itemid);
+		
+		return $import;
+	}
+}
+
 abstract class Component extends Bean {
 	protected $module;
 	protected $parent;

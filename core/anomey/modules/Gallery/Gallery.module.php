@@ -33,22 +33,33 @@
  * @autor Adrian Egloff<adrian.egloff@gmail.com>
  * @date 08.11.2006
  * 
- * @todo Fallback "NoThumbnail" Image ??
- * @todo Gallery2 plugin ??
  * 
  * Last Changes:
+ * - redesign of admin panel
+ * - admin settingspage
+ * - no image thumbnail
+ * - implemented pages
  * - Thumbnail fallback with random Thumbnails
  * - Implemented the Composite Pattern for the Tree Structure
  * - Image Cach implemented
  * - Import for Picasa and Flickr Galleries
  * - Admin Import
  * 
+ * 
+ * Thanks to fabian who made this nice looking <ul><li>-boxes :)
+ * 
  */
 
-include_once('Composite.pattern.php');
+include_once('Beans.classes.php');
 include_once('GalleryItem.class.php');
 include_once('ImageItem.class.php');
 
+/**
+ * This is the model of the gallery module
+ * 
+ * It loads, holds and saves alldata when they are changed. There are some datastructure classes which are needed by the model
+ * in th Beans.classes.php file.
+ */
 class Gallery extends Module {
 	private $settings;
 	private $root;
@@ -56,6 +67,7 @@ class Gallery extends Module {
 	private $storage = array();
 	private $imports = array();
 	private $sxml;
+	private $state;
 	
 	public function getAvailablePermissions() {
 		return array (
@@ -76,6 +88,7 @@ class Gallery extends Module {
 			catch (FileNotFoundException $e) {}
 		}
 		
+		$this->checkState();
 		$this->loadSettings();
 		$this->loadItems();
 		$this->loadImports();
@@ -90,6 +103,34 @@ class Gallery extends Module {
 		}
 		
 		$this->save();*/
+	}
+	
+	private function checkState(){
+		$this->state = new State();
+		
+		// gd check
+
+		$this->state->tools['gd'] = function_exists('gd_info');
+
+		$this->state->formats['image/gif'] = function_exists('imagecreatefromgif');
+		$this->state->formats['image/jpeg'] = function_exists('imagecreatefromjpeg');
+		$this->state->formats['image/png'] = function_exists('imagecreatefrompng');
+		
+		// image magick check
+		
+		// cache check
+			
+	}
+	
+	public function getState(){
+		return $this->state;
+	}
+	
+	public function checkFormat($format){
+		if(isset($this->state->formats[$format]) && $this->state->formats[$format])
+			return true;
+		else
+			return false;
 	}
 	
 	private function loadSettings(){
@@ -174,7 +215,13 @@ class Gallery extends Module {
 			$gallery->addAttribute('title', 'Flickr Testgallery');
 
 		}
-		$this->root = $this->loadItem(null, $this->sxml->item[0]);
+		
+		try {
+			$this->root = $this->loadItem(null, $this->sxml->item[0]);
+		}
+		catch (ImportException $e){
+			echo "could not import";
+		}
 	}
 	
 	public function setStorage($url_path){
@@ -183,12 +230,13 @@ class Gallery extends Module {
 		$this->storage['web'] = $url_path. $this->getSecurity()->getProfile() . '/tmp/cache/'.$this->getId().'/';
 		
 		if(!file_exists($this->storage['cache'])){
-			// create cache-folder (recursive)
-			mkdir($this->storage['cache'], 0755, true);
+			// create cache-folder
+			mkdir($this->storage['cache']);
 		}
 		if(!file_exists($this->storage['local'])){
-			// create media-folder (recursive)
-			mkdir($this->storage['local'], 0755, true);
+			// create media-folder
+			mkdir($this->getSecurity()->getProfile() . '/media/'.$this->getId());
+			mkdir($this->storage['local']);
 		}
 	}
 	
@@ -205,6 +253,10 @@ class Gallery extends Module {
 			}
 		}
 		return $item;
+	}
+	
+	public function getDefaultImage(){
+		return $this->getSecurity()->getProfile() . '/modules/Gallery/noimage.jpeg';
 	}
 
 	public function selectItem($parameter){
@@ -251,22 +303,46 @@ class Gallery extends Module {
 		return array_reverse($path);
 	}
 	
-	public function resizeImage($source, $settings){
+	public function prepareImage(ImageItem $item, $settings){
+		if($this->state->tools['gd']){
+			$this->prepareImageGD($item, $settings);
+		}
+		else{
+			//throw new ImportException('No graphic library available.');
+		}
+		
+	}
+	
+	/**
+	 * This function prepares an image. It resizes the image to the given size and crops it if it has to.
+	 * 
+	 * @param ImageItem $item image which should be prepared
+	 * @param $settings array which includes the size of an image and if it should be croped or not
+	 */
+	private function prepareImageGD(ImageItem $item, $settings){
+		$source = $item->getSource();
+		$cache = $item->getCache($settings);
+		
 		$image_info = getimagesize($source);
 		if(!$image_info){
-			return null;
+			throw new ImportException('Could not load image.');
 		}
-
+		
 		switch ($image_info['mime']) {
 			case 'image/gif':
-				$image = imagecreatefromgif($source) ;
+				$image = imagecreatefromgif($source);
+				$item->setType('gif');
 				break;
 			case 'image/jpeg':
-				$image = imagecreatefromjpeg($source) ;
+				$image = imagecreatefromjpeg($source);
+				$item->setType('jpeg');
 				break;
 			case 'image/png':
-				$image = imagecreatefrompng($source) ;
+				$image = imagecreatefrompng($source);
+				$item->setType('png');
 				break;
+			default:
+				throw new ImportException("Unknown image format.");
 		}
 		
 		$width_src = $image_info[0];
@@ -319,10 +395,21 @@ class Gallery extends Module {
 			$resized = imagecreatetruecolor($width_dst, $height_dst);
 			
 			imagecopyresampled($resized, $image, -($width_calc/2) + ($width_dst/2), -($height_calc/2) + ($height_dst/2), 0, 0, $width_calc, $height_calc, $width_src, $height_src);
-		
 		}
 		
-		return $resized;
+		switch ($item->getType()) {
+			case 'gif':
+				imagegif($resized, $cache);
+				break;
+			case 'jpeg':
+				imagejpeg($resized, $cache);
+				break;
+			case 'png':
+				imagepng($resized, $cache);
+				break;
+			default:
+				throw new ImportException("Unknown image format.");
+		}
 	}
 
 	public function addGallery($title, $date, $parent){
@@ -381,112 +468,16 @@ class Gallery extends Module {
 	}
 }
 
-class Settings extends Bean {
-	private $cols;
-	private $rows;
-	private $nextid;
-	private $thumb;
-	private $image;
-	
-	public function __construct($sxml) {
-		$this->cols = (int) $sxml['cols'];
-		$this->rows = (int) $sxml['rows'];
-		$this->nextid = (int) $sxml['nextid'];
-		$this->thumb = array(	'width' => (int) $sxml->thumb[0]['width'], 
-								'height' => (int) $sxml->thumb[0]['height'], 
-								'crop' => (string) $sxml->thumb[0]['crop'] == 'false' ? false : true
-							);
-		$this->image = array(	'width' => (int) $sxml->image[0]['width'], 
-								'height' => (int) $sxml->image[0]['height'], 
-								'crop' => (string) $sxml->image[0]['crop'] == 'false' ? false : true
-							);
-	}
-	
-	public function getFolder() {
-		return $this->folder;
-	}
-	
-	public function getCols() {
-		return $this->cols;
-	}
-	
-	public function getRows() {
-		return $this->rows;
-	}
-	
-	public function getThumbSettings() {
-		return $this->thumb;
-	}
-	
-	public function getImageSettings() {
-		return $this->image;
-	}
-	
-	public function getNextId() {
-		return $this->nextid++;
-	}
-	
-	public function saveSettings(SimpleXmlElement $sxml){
-		$settings = $sxml->addChild('settings');
-		$settings->addAttribute('cols', $this->cols);
-		$settings->addAttribute('rows', $this->rows);
-		$settings->addAttribute('nextid', $this->nextid);
-		$thumb = $settings->addChild('thumb');
-		$thumb->addAttribute('height', $this->thumb['height']);
-		$thumb->addAttribute('width', $this->thumb['width']);
-		$thumb->addAttribute('crop', ($this->thumb['crop'] ? 'true' : 'false'));
-		$image = $settings->addChild('image');
-		$image->addAttribute('height', $this->image['height']);
-		$image->addAttribute('width', $this->image['width']);
-		$image->addAttribute('crop', ($this->image['crop'] ? 'true' : 'false'));
-	}
-}
 
-abstract class Import extends Bean{
-	protected $class;
-	protected $item;
-	protected $itemid;
-	protected $module;
-	
-	public function __construct($sxml, $module) {
-		$this->class = (string) $sxml['class'];
-		$this->itemid = (int) $sxml['item'];
-		$this->module = $module;
-		
-		$root = $module->getRoot();
-		if(isset($root))
-			$this->item = $root->searchItem(array('id' => $this->itemid));
-		
-		if($this->item == null)
-			return null;
-	}
-	
-	public abstract function doit();
-	
-	public function getClass(){
-		return $this->class;
-	}
-	
-	public function getItem(){
-		return $this->item;
-	}
-		
-	public function getItemId(){
-		return $this->itemid;
-	}
-	
-	public function saveImport(SimpleXmlElement $sxml){
-		$import = $sxml->addChild('import');
-		$import->addAttribute('class', $this->class);
-		$import->addAttribute('item', $this->itemid);
-		
-		return $import;
-	}
-}
+// Exceptions ...
 
+/**
+ * Thrown when the import and conversion of an image failed
+ * 
+ */
 class ImportException extends Exception { }
 
-
+// Actions
 class GalleryAction extends Action implements ActionContainer, ProtectedAction {
 	
 	public static function getActions() {
@@ -503,8 +494,25 @@ class GalleryAction extends Action implements ActionContainer, ProtectedAction {
 	
 	public function execute() {
 		$this->getModel()->setStorage($this->getProcessor()->getURL()->getPath());
-		
 		$this->getModel()->selectItem($this->getRequest()->getParameters());
+		
+		$settings = $this->getModel()->getSettings();
+		
+		$page = $this->getRequest()->getParameter('page', 0);
+		$this->getDesign()->assign('cols', $settings->getCols());
+		$this->getDesign()->assign('rows', $settings->getRows());
+		$this->getDesign()->assign('page', $page);
+		
+		$itemsperpage = $settings->getCols() * $settings->getRows();
+		$start = $itemsperpage * $page;
+		$end = $start + $itemsperpage;
+		
+		$this->getDesign()->assign('start', $start);
+		$this->getDesign()->assign('end', $end);
+		$this->getDesign()->assign('nextpage', $page+1);
+		$this->getDesign()->assign('prevpage', $page-1);
+		
+		
 		$this->getDesign()->assign('gallerypath', $this->getModel()->getGalleryPath());
 		$this->getDesign()->assign('settings', $this->getModel()->getSettings());
 		$this->getDesign()->assign('gallery', $this->getModel()->getItem());
@@ -512,6 +520,8 @@ class GalleryAction extends Action implements ActionContainer, ProtectedAction {
 		$this->getDesign()->display('Gallery/gallery.tpl');
 	}
 }
+
+// Admin actions
 
 /* modifier actions -- DO NOT USE !!!
 
@@ -601,6 +611,10 @@ class GalleryAdminAction extends AbstractAdminAction implements ActionContainer 
 	
 	public static function getActions() {
 		return array(
+			'content' => 'GalleryAdminContentAction',
+			'settings' => 'GalleryAdminSettingsAction',
+			'state' => 'GalleryAdminStateAction',
+			
 			'import' => 'GalleryAdminImportAction',
 			'addgallery' => 'GalleryAdminAddGalleryAction',
 			'addimport' => 'GalleryAdminAddImportAction',
@@ -609,6 +623,13 @@ class GalleryAdminAction extends AbstractAdminAction implements ActionContainer 
 			'edit' => 'GalleryAdminEditGalleryAction'
 		);
 	}
+	
+	public function execute() {
+		$this->forward('content');
+	}
+}
+
+class GalleryAdminContentAction extends AbstractAdminAction {
 	
 	public static function getRequiredPermissions() {
 		return array(
@@ -623,14 +644,11 @@ class GalleryAdminAction extends AbstractAdminAction implements ActionContainer 
 		$this->getModel()->getRoot()->listGalleries(&$galleries, 0);
 		
 		$this->getDesign()->assign('galleries', $galleries);
-		$this->getDesign()->display('Admin/Gallery/gallery.tpl');
-		
+		$this->getDesign()->display('Admin/Gallery/content.tpl');
 	}
 }
 
-
-
-class GalleryAdminImportAction extends AbstractAdminAction {
+class GalleryAdminStateAction extends AbstractAdminAction {
 	
 	public static function getRequiredPermissions() {
 		return array(
@@ -639,27 +657,87 @@ class GalleryAdminImportAction extends AbstractAdminAction {
 	}
 	
 	public function execute() {
-		$parameter = $this->getRequest()->getParameters();
+		$this->getDesign()->assign('state', $this->getModel()->getState());
 		
-		$import = $this->getModel()->getImport($parameter['id']);
-			
-		if(isset($import)){
-			try{
-				$this->getModel()->setStorage($this->getProcessor()->getURL()->getPath());
-				$import->import();
-				$this->getModel()->save();
-				$message = new Message($import->getItem()->getTitle().' successfully imported.');
-			}
-			catch(ImportException $e){
-				$message = new ErrorMessage($e->getMessage());
-			}
-		}
-		
-		$this->forward('', $message);
+		$this->getDesign()->display('Admin/Gallery/state.tpl');
+	}
+}
 
+class GalleryAdminSettingsForm extends Form {
+	public $thumbwidth = 0;
+	public $thumbheight = 0;
+	public $thumbcrop = false;
+	
+	public $imagewidth = 0;
+	public $imageheight = 0;
+	public $imagecrop = false;
+	
+	public $rows = 0;
+	public $cols = 0;
+	
+	protected function validate() {
+		
+	}
+}
+
+class GalleryAdminSettingsAction extends AbstractAdminFormAction {
+	
+	public static function getRequiredPermissions() {
+		return array(
+			'edit'
+		);
+	}
+	
+	public function getTemplate() {
+		return 'Admin/Gallery/settings.tpl';
 	}
 
+	protected function createForm() {
+		return new GalleryAdminSettingsForm();
+	}
+
+	protected function loadForm(Form $form) {
+		$settings = $this->getModel()->getSettings();
+		$thumb = $settings->getThumbSettings();
+		$image = $settings->getImageSettings();
+		
+		$form->thumbwidth = $thumb['width'];
+		$form->thumbheight = $thumb['height'];
+		$form->thumbcrop = $thumb['crop'];
+		
+		$form->imagewidth = $image['width'];
+		$form->imageheight = $image['height'];
+		$form->imagecrop = $image['crop'];
+		
+		$form->cols = $settings->getCols();
+		$form->rows = $settings->getRows();
+	}
+
+	public function succeed(Form $form) {	
+		$thumb = array();
+		$thumb['width'] = $form->thumbwidth;
+		$thumb['height'] = $form->thumbheight;
+		$thumb['crop'] = $form->thumbcrop;
+		
+		$image = array();
+		$image['width'] = $form->imagewidth;
+		$image['height'] = $form->imageheight;
+		$image['crop'] = $form->imagecrop;
+		
+		$settings = $this->getModel()->getSettings();
+		$settings->setThumbSettings($thumb);
+		$settings->setImageSettings($image);
+		$settings->setCols($form->cols);
+		$settings->setRows($form->rows);
+		
+		$this->getModel()->save();
+
+		return new Message('Settings saved!');
+	}
 }
+
+
+// Add a new gallery
 
 class GalleryAdminGalleryForm extends Form {
 	public $id = 0;
@@ -715,6 +793,8 @@ class GalleryAdminAddGalleryAction extends AbstractAdminFormAction {
 		return new Message('Gallery created!');
 	}
 }
+
+// Add a new import
 
 class GalleryAdminDeleteGalleryAction extends AbstractAdminAction {
 	public static function getRequiredPermissions() {
@@ -812,11 +892,12 @@ class GalleryAdminAddImageAction extends AbstractAdminFormAction {
 			$message = new Message('Image added!');
 		}
 		else{
-			if($_FILES['uploadimage']['type'] != 'image/jpeg')
-				return new WarningMessage('At the moment you can only upload jpeg files.');
+			if(!$this->getModel()->checkFormat($_FILES['uploadimage']['type']))
+				return new WarningMessage('Your image format is not supportet. Whatch the state-page.');
+			
 			$folder = $this->getModel()->getMediaPath() . '/galleries/' . $form->parentid . '/';
 			if(!file_exists($folder))
-				mkdir($folder, 0755, true);
+				mkdir($folder);
 			if(move_uploaded_file($_FILES['uploadimage']['tmp_name'], $folder . basename($_FILES['uploadimage']['name']))) {
 				$source = $folder . basename($_FILES['uploadimage']['name']);
 				$message = new Message('Image uploaded!');
@@ -897,6 +978,38 @@ class GalleryAdminAddImportAction extends AbstractAdminFormAction {
 
 		return new Message('Import created!');
 	}
+}
+
+
+class GalleryAdminImportAction extends AbstractAdminAction {
+	
+	public static function getRequiredPermissions() {
+		return array(
+			'edit'
+		);
+	}
+	
+	public function execute() {
+		$parameter = $this->getRequest()->getParameters();
+		
+		$import = $this->getModel()->getImport($parameter['id']);
+			
+		if(isset($import)){
+			try{
+				$this->getModel()->setStorage($this->getProcessor()->getURL()->getPath());
+				$import->doit();
+				$this->getModel()->save();
+				$message = new Message($import->getItem()->getTitle().' successfully imported.');
+			}
+			catch(ImportException $e){
+				$message = new ErrorMessage($e->getMessage());
+			}
+		}
+		
+		$this->forward('', $message);
+
+	}
+
 }
 
 ?>
