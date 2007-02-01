@@ -1,11 +1,11 @@
 {layout template="Admin/edit.tpl"}
 
-{capture assign="actions"}
-<ul id="actions">
-  {link trail="addgallery" id=$item.id}<li><a href="{$href}" class="action add_entry">Add new gallery</a></li>{/link}
-  {link trail="addimage" id=$item.id}<li><a href="{$href}" class="action add_entry">Add new image</a></li>{/link}
-  {link trail="addimport" id=$item.id}<li><a href="{$href}" class="action add_entry">Add new import</a></li>{/link}
- </ul>
+{capture assign="middle"}
+<ul id="pageNavigation" class="navigation">
+	{link trail="content"}<li><a{if $active} class="active"{/if} href="{$href}">Content</a></li>{/link}
+	{link trail="settings"}<li><a{if $active} class="active"{/if} href="{$href}">Settings</a></li>{/link}
+	{link trail="state"}<li><a{if $active} class="active"{/if} href="{$href}">State</a></li>{/link}
+</ul>
 {/capture}
 
 {$content}

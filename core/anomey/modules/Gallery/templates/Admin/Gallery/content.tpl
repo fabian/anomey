@@ -1,5 +1,14 @@
 {layout template="Admin/Gallery/layout.tpl"}
 
+{capture assign="actions"}
+<ul id="actions">
+  {link trail="addgallery" id=$item.id}<li><a href="{$href}" class="action add_entry">Add new gallery</a></li>{/link}
+  {link trail="addimage" id=$item.id}<li><a href="{$href}" class="action add_entry">Add new image</a></li>{/link}
+  {link trail="addimport" id=$item.id}<li><a href="{$href}" class="action add_entry">Add new import</a></li>{/link}
+ </ul>
+{/capture}
+
+
 <h2>Galleries</h2>
 <table>
 <tr><th>Title</th><th>Class</th><th>Actions</th></tr>
