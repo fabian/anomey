@@ -32,6 +32,10 @@
 		{if $cols != 0 && $smarty.foreach.items.iteration % $cols == 0}
 			</ul><ul class="box">
 		{/if}
+	{else}
+		{if $item.class == "Image"}
+			<a href="{$item.item}" class="hide" rel="lightbox[{$gallery.id}]" class="item"><img src="{$item.thumb}" /></a>
+		{/if}
 	{/if}
 {foreachelse}
 	<li>Nothing found.</li>
