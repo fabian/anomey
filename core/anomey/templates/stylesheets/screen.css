@@ -119,3 +119,7 @@ ul.box li {
 .message.error {
  color: #db0c0c;
 }
+
+.hide {
+	display: none;
+}
