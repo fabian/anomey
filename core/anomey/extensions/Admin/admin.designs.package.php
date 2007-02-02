@@ -30,7 +30,7 @@ class AdminDesignsAction extends AdminBaseAction implements ActionContainer {
 
 	public static function getActions() {
 		return array(
-			'edit' => 'AdminEditDesignAction'
+			URI::CHARS . '*' => 'AdminDesignsDesignAction'
 		);
 	}
 
@@ -40,21 +40,49 @@ class AdminDesignsAction extends AdminBaseAction implements ActionContainer {
 	}
 }
 
-class AdminEditDesignAction extends AdminBaseAction implements ActionContainer {
+class AdminDesignsDesignAction extends AdminBaseAction implements ActionContainer {
 
 	public static function getActions() {
 		return array(
-			'files' => 'AdminEditDesignFilesAction'
+			'files' => 'AdminDesignsFilesAction'
 		);
+	}	
+
+	private $design;
+	
+	protected function load() {
+		$this->design = $this->getRequest()->getParameter(0);
+	}
+	
+	protected function getBase() {
+		return '/admin/designs/' . $this->design;
 	}
 	
 	public function execute() {
-		$this->forward('/admin/designs/edit/files/' . $this->getRequest()->getParameter(1));
+		$this->forward('files');	
 	}
 }
 
-class AdminEditDesignFilesAction extends AdminBaseAction {
+class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer {
+
+	public static function getActions() {
+		return array(
+			URI::CHARS . '*' => 'AdminDesignsFileAction'
+		);
+	}	
+
+	private $design;
+	
+	protected function load() {
+		$this->design = $this->getRequest()->getParameter(0);
+	}
+	
+	protected function getBase() {
+		return '/admin/designs/' . $this->design;
+	}
+	
 	public function execute() {
+		var_dump($this->design);
 		$files = array();		
 
 		$path = $this->getSecurity()->getProfile() . '/designs/darkblue/templates';
@@ -64,9 +92,26 @@ class AdminEditDesignFilesAction extends AdminBaseAction {
 			}
 		}
 
-
 		$this->getDesign()->assign('files', $files);
 		$this->getDesign()->display('Admin/design.tpl');
+	}
+}
+
+class AdminDesignsFileAction extends DynamicAction {
+
+	private $design;
+	
+	protected function load() {
+		$this->design = $this->getRequest()->getParameter(0);
+	}
+	
+	protected function getBase() {
+		return '/admin/designs/' . $this->design;
+	}
+	
+	protected function index() {
+		echo 'File!';
+		var_dump($this->design);
 	}
 }
 

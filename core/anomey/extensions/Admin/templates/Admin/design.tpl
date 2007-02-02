@@ -2,8 +2,8 @@
 
 {capture assign="middle"}
 <ul id="pageNavigation" class="navigation">
-	{link trail="/admin/designs/edit/files"}<li><a{if $active} class="active"{/if} href="{$href}">Files</a></li>{/link}
-	{link trail="/admin/designs/edit/settings"}<li><a{if $active} class="active"{/if} href="{$href}">Settings</a></li>{/link}
+	{link trail=""}<li><a{if $active} class="active"{/if} href="{$href}">Files</a></li>{/link}
+	{link trail="settings"}<li><a{if $active} class="active"{/if} href="{$href}">Settings</a></li>{/link}
 </ul>
 {/capture}
 
@@ -30,7 +30,7 @@
  {foreach from=$files item=file key=name}
  <tr{cycle values=", class=\"even\""}>
   <td>{$file}</td>
-  <td><ul class="actions"><li>{link trail="admin/designs/edit/`$name`"}<a href="{$href}" class="action edit">edit</a>{/link}</li>
+  <td><ul class="actions"><li>{link trail="edit/`$name`"}<a href="{$href}" class="action edit">edit</a>{/link}</li>
   <li>{link trail="admin/designs/delete" design=$name}<a href="{$href}" class="action delete">delete</a>{/link}</li>
   </ul></td>
  </tr>

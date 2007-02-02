@@ -30,7 +30,7 @@ class AdminPagesAction extends AdminBaseAction implements ActionContainer {
 
 	public static function getActions() {
 		return array (
-			'edit' => 'AdminPageEditAction',
+			'o[0-9]*' => 'AdminPageEditAction',
 			'up' => 'AdminPageUpAction',
 			'down' => 'AdminPageDownAction',
 			'delete' => 'AdminPageDeleteAction',
@@ -93,7 +93,7 @@ abstract class AbstractAdminAction extends Action implements ProtectedAction, Se
 	}
 	
 	protected function getBase() {
-		return '/admin/pages/edit/' . $this->getModel()->getId();
+		return '/admin/pages/' . $this->getModel()->getId();
 	}
 }
 
@@ -105,7 +105,7 @@ abstract class AbstractAdminFormAction extends FormAction implements ProtectedAc
 	}
 	
 	protected function getBase() {
-		return '/admin/pages/edit/' . $this->getModel()->getId();
+		return '/admin/pages/' . $this->getModel()->getId();
 	}
 }
 
@@ -116,7 +116,7 @@ abstract class AbstractDefaultAdminFormAction extends AbstractAdminFormAction im
 	}
 	
 	protected function getBase() {
-		return '/admin/pages/edit/' . $this->getModel()->getId();
+		return '/admin/pages/' . $this->getModel()->getId();
 	}
 	
 	protected function getReturn() {
@@ -209,7 +209,27 @@ class DefaultAdminAction extends AbstractDefaultAdminFormAction implements Prote
 
 class AdminPageEditAction extends AdminBaseAction {
 	public function execute() {
-		$this->forward('/admin/pages', new WarningMessage('Please select a page to edit!'));
+		try {
+			$container = new LinkContainer();
+	
+			$module = $this->getModel()->getPage($this->getRequest()->getParameter(0));
+			$actionClass = get_class($module) . 'AdminAction';
+			if (class_exists($actionClass)) {
+				$class = new ReflectionClass($actionClass);
+				$adminLink = new SecureLink($module, $module->getTitle(), $module->getHide(), $actionClass);
+				Processor :: parseAction($module, $adminLink);
+			} else {
+				$adminLink = new SecureLink($module, $module->getTitle(), true, 'DefaultAdminAction');
+				$adminLink->addRequiredPermission('edit');
+				$adminLink->setSecurity('high');
+			}
+			
+			$container->add('.*', $adminLink);
+			$trail = substr($this->getRequest()->getTrail(), strlen('/admin/pages'));
+			$this->getProcessor()->callAction($container, $this->getRequest(), $trail, $this->getSecurity());
+		} catch (PageNotFoundException $e) {
+			$this->forward('/admin/pages', new WarningMessage('Page does not exist!'));
+		}
 	}
 }
 

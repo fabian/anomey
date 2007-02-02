@@ -61,12 +61,15 @@ class LinkContainer extends Bean {
 		return $this->links;
 	}
 
-	public function getLink($key) {
-		if (isset ($this->links[$key])) {
-			return $this->links[$key];
-		} else {
-			throw new LinkNotFoundException('Link with key "' . $key . '" not found.');
+	public function getLink($name) {
+		if($name) {
+			foreach(array_keys($this->links) as $pattern) {
+				if(preg_match('/^' . $pattern . '$/i', $name)) {
+					return $this->links[$pattern];
+				}
+			}
 		}
+		throw new LinkNotFoundException('Link with pattern "' . $pattern . '" not found.');
 	}
 
 	public function add($name, Link $link) {
@@ -188,7 +191,7 @@ class Processor extends LinkContainer {
 					
 				foreach($actions as $name => $actionClass) {
 					$trail = '/' . $name;
-					$link = new SecureLink($site, '', $trail, true, $actionClass);
+					$link = new SecureLink($site, '', true, $actionClass);
 					self::parseAction($site, $link);
 					$this->add($name, $link);
 				}
@@ -249,13 +252,17 @@ class Processor extends LinkContainer {
 	}
 
 	private function executeAction($request, $trail) {
+		$this->callAction($this, $request, $trail, $this->security);
+	}
+	
+	public function callAction(LinkContainer $container, $request, $trail, $security) {
 		try {
-			$link = $this->findLink($this, $trail);
+			$link = $this->findLink($container, $trail);
 		} catch (LinkNotFoundException $e) {
 			throw new ActionNotFoundException($e->getMessage());
 		}
 		
-		$link->execute($this, $request, $this->security);
+		$link->execute($this, $request, $security);
 	}
 
 	public function refresh($request) {
@@ -326,8 +333,7 @@ class Processor extends LinkContainer {
 				'getActions'
 			));
 			foreach($actions as $name => $actionClass) {
-				$newTrail = $parent->getTrail() . '/' . $name;
-				$link = new SecureLink($model, '', $newTrail, true, $actionClass);
+				$link = new SecureLink($model, '', true, $actionClass);
 				self::parseAction($model, $link);
 				$parent->add($name, $link);
 			}
@@ -337,7 +343,7 @@ class Processor extends LinkContainer {
 	private function createIndex(LinkContainer $parentLink, Model $model) {
 		foreach ($model->getChilds() as $name => $module) {
 			$actionClass = get_class($module) . 'Action';
-			$link = new SecureLink($module, $module->getTitle(), $module->getPath(), $module->getHide(), $actionClass);
+			$link = new SecureLink($module, $module->getTitle(), $module->getHide(), $actionClass);
 			self::parseAction($module, $link);
 			
 			$parentLink->add($name, $link);
@@ -356,20 +362,35 @@ class Processor extends LinkContainer {
 	/**
 	 * @param LinkContainer $link
 	 * @param string $trail
+	 * @param array $orig	The original trail (as array) to the searched link. (optional)
 	 */
-	public static function findLink(LinkContainer $link, $trail) {
+	public static function findLink(LinkContainer $linkcontainer, $trail, $orig = null) {
+		if(substr($trail, 0, 1) == '/') {
+			// remove leading slash
+			$trail = substr($trail, 1);
+		}
 
 		$pathArray = explode('/', $trail);
+		
+		if($orig == null) {
+			$orig = $pathArray;
+		}
 
-		$name = Value :: get($pathArray[1]);
+		$name = Value :: get($pathArray[0]);
 
-		$currentLink = $link->getLink($name);
+		$link = $linkcontainer->getLink($name);
 
 		try {
-			unset ($pathArray[1]); // Delete the current link
-			$link = self :: findLink($currentLink, implode('/', $pathArray));
+			unset ($pathArray[0]); // Delete the current link
+			$link = self :: findLink($link, implode('/', $pathArray), $orig);
 		} catch (LinkNotFoundException $e) {
-			$link = $currentLink;
+			$thetrail = $orig;
+			if(count($pathArray) > 0) {
+				$thetrail = array_slice($orig, 0, -(count($pathArray)));
+			}
+			$name = end($thetrail);
+			$link->setName($name);
+			$link->setTrail('/' . implode('/', $thetrail));
 		}
 
 		return $link;
@@ -415,21 +436,34 @@ abstract class Link extends LinkContainer {
 		return $this->title;
 	}
 
-	private $trail;
-
-	public function getTrail() {
-		return $this->trail;
-	}
-
 	private $hide;
 
 	public function getHide() {
 		return $this->hide;
 	}
-
-	function __construct($title, $trail, $hide) {
-		$this->title = $title;
+	
+	private $trail = '';
+	
+	public function getTrail() {
+		return $this->trail;
+	}
+	
+	public function setTrail($trail) {
 		$this->trail = $trail;
+	}
+	
+	private $name = '';
+	
+	public function getName() {
+		return $this->name;
+	}
+	
+	public function setName($name) {
+		$this->name = $name;
+	}
+
+	function __construct($title, $hide) {
+		$this->title = $title;
 		$this->hide = $hide;
 	}
 
@@ -480,8 +514,8 @@ class SecureLink extends Link {
 		return $this->action;
 	}
 
-	public function __construct(Model $model, $title, $trail, $hide, $action) {
-		parent :: __construct($title, $trail, $hide);
+	public function __construct(Model $model, $title, $hide, $action) {
+		parent :: __construct($title, $hide);
 		$this->model = $model;
 		$this->action = $action;
 	}
@@ -495,6 +529,8 @@ class SecureLink extends Link {
 			throw new TrustedUserRequiredException('User ' . $nick . ' needs to be trusted to access this page!');
 		}
 		$trail = explode('/', substr($request->getTrail(), strlen($this->getTrail())));
+		$trail[0] = $this->getName();
+		
 		$request->addParameters($trail);
 
 		// load model data
@@ -525,7 +561,7 @@ class SiteLink extends Link {
 	private $action;
 
 	public function __construct(Site $site, $title, $hide, $action) {
-		parent :: __construct($title, '/', $hide);
+		parent :: __construct($title, $hide);
 		$this->site = $site;
 		$this->action = $action;
 	}

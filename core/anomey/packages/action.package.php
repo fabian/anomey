@@ -94,12 +94,18 @@ abstract class Action implements WebAction {
 		
 		$this->design = $this->getModel()->getDesign();
 		
+		$this->load();
+		
 		$this->design->assign('processor', $this->getProcessor());
 		$this->design->assign('request', $this->getRequest());
 		$this->design->assign('model', $this->getModel());
 		$this->design->assign('base', $this->getBase());
 		$this->design->assign('self', $this->getProcessor()->findLink($this->getProcessor(), $this->getRequest()->getTrail()));
 		$this->design->assign('version', Anomey::VERSION);
+	}
+	
+	protected function load() {
+		// to be overloaded
 	}
 	
 	protected function forward($trail, $message = null) {
@@ -111,6 +117,23 @@ abstract class Action implements WebAction {
 		
 		$this->getProcessor()->forward($this->getRequest(), $trail, $this->getRequest()->getMessages());
 	}
+}
+
+abstract class DynamicAction extends Action {
+	
+	public function execute() {
+		$action = $this->getRequest()->getParameter(1);
+		
+		if(!method_exists($this, $action) or in_array(strtolower($action), array('getprocessor', 'getrequest', 
+			'getmodel', 'getsecurity', 'getdesign', 'getbase', 'getcontenttype', '__construct', 
+			'load', 'execute', 'forward'))) {
+			$action = 'index';
+		}
+		
+		$this->$action();
+	}
+	
+	abstract protected function index();
 }
 
 ?>

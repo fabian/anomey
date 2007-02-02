@@ -24,7 +24,7 @@
  <tr{cycle values=", class=\"even\""}>
   <td>{$design.title}</td>
   <td>{$design.author}</td>
-  <td><ul class="actions"><li>{link trail="admin/designs/edit/`$name`"}<a href="{$href}" class="action edit">edit</a>{/link}</li>
+  <td><ul class="actions"><li>{link trail="admin/designs/`$name`"}<a href="{$href}" class="action edit">edit</a>{/link}</li>
   <li>{link trail="admin/designs/delete" design=$name}<a href="{$href}" class="action delete">delete</a>{/link}</li>
   </ul></td>
  </tr>

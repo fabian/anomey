@@ -28,31 +28,6 @@
 
 class Admin extends Extension implements ActionContainer {
 
-	private $editLink;
-
-	public function load() {
-		$this->editLink = $this->getProcessor()->findLink($this->getProcessor(), '/admin/pages/edit');
-		$this->createIndex($this->getSite());
-	}
-
-	private function createIndex(Model $model) {
-		foreach ($model->getChilds() as $name => $module) {
-			$actionClass = get_class($module) . 'AdminAction';
-			if (class_exists($actionClass)) {
-				$class = new ReflectionClass($actionClass);
-				$adminLink = new SecureLink($module, $module->getTitle(), '/admin/pages/edit/' . $module->getId(), $module->getHide(), $actionClass);
-				Processor :: parseAction($module, $adminLink);
-			} else {
-				$adminLink = new SecureLink($module, $module->getTitle(), '/admin/pages/edit/' . $module->getId(), true, 'DefaultAdminAction');
-				$adminLink->addRequiredPermission('edit');
-				$adminLink->setSecurity('high');
-			}
-
-			$this->editLink->add($module->getId(), $adminLink);
-			$this->createIndex($module);
-		}
-	}
-
 	public static function getActions() {
 		return array (
 			'admin' => 'AdminAction'
