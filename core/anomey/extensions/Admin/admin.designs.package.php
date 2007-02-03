@@ -69,23 +69,23 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 		return array(
 			URI::CHARS . '*' => 'AdminDesignsFileAction'
 		);
-	}	
+	}
 
 	private $design;
 	
 	protected function load() {
-		$this->design = $this->getRequest()->getParameter(0);
+		$this->design = $this->getRequest()->getParameter(-1);
 	}
 	
 	protected function getBase() {
-		return '/admin/designs/' . $this->design;
+		return '/admin/designs/' . $this->design . '/files';
 	}
 	
 	public function execute() {
 		var_dump($this->design);
 		$files = array();		
 
-		$path = $this->getSecurity()->getProfile() . '/designs/darkblue/templates';
+		$path = $this->getSecurity()->getProfile() . '/designs/' . $this->design . '/templates';
 		foreach (scandir($path) as $name) {
 			if(is_file($path . '/'. $name)) {
 				$files[] = $name;
@@ -97,7 +97,7 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 	}
 }
 
-class AdminDesignsFileAction extends DynamicAction {
+class AdminDesignsFileAction extends AdminBaseFormAction {
 
 	private $design;
 	
@@ -106,10 +106,10 @@ class AdminDesignsFileAction extends DynamicAction {
 	}
 	
 	protected function getBase() {
-		return '/admin/designs/' . $this->design;
+		return '/admin/designs';
 	}
 	
-	protected function index() {
+	public function execute() {
 		echo 'File!';
 		var_dump($this->design);
 	}
