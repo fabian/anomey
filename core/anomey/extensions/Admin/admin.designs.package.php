@@ -67,7 +67,7 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 
 	public static function getActions() {
 		return array(
-			URI::CHARS . '*' => 'AdminDesignsFileAction'
+			//URI::CHARS . '*' => 'AdminDesignsFileAction'
 		);
 	}
 
@@ -97,7 +97,7 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 	}
 }
 
-class AdminDesignsFileAction extends AdminBaseFormAction {
+/*class AdminDesignsFileAction extends AdminBaseFormAction {
 
 	private $design;
 	
@@ -113,6 +113,6 @@ class AdminDesignsFileAction extends AdminBaseFormAction {
 		echo 'File!';
 		var_dump($this->design);
 	}
-}
+}*/
 
 ?>
