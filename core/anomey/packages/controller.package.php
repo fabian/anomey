@@ -52,6 +52,8 @@ class Controller {
 	
 	public function __construct($profile, $base) {
 		try {
+			ob_start();
+			
 			$this->profile = $profile;
 	
 			// -----------------------------
@@ -222,10 +224,12 @@ class Controller {
 	
 			$processor = new Processor($url, $profile . '/xml/config.xml', $security, $site);
 			$processor->execute($request);
-				
-		} catch (ErrorException $e) {
+			
+		} catch (Exception $e) {
+			$code = ob_get_clean();
 			include 'error.view.php';
 		}
+		ob_end_flush();
 	}
 	
 	private static function createFolder($name, $protected = false) {
