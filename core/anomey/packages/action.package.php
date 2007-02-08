@@ -100,7 +100,11 @@ abstract class Action implements WebAction {
 		$this->design->assign('request', $this->getRequest());
 		$this->design->assign('model', $this->getModel());
 		$this->design->assign('base', $this->getBase());
-		$this->design->assign('self', $this->getProcessor()->findLink($this->getProcessor(), $this->getRequest()->getTrail()));
+		try {
+			$this->design->assign('self', $this->getProcessor()->findLink($this->getProcessor(), $this->getRequest()->getTrail()));
+		} catch(LinkNotFoundException $e) {
+			// ignore as action doesn't really exist
+		}
 		$this->design->assign('version', Anomey::VERSION);
 	}
 	
