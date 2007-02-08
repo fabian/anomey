@@ -288,7 +288,7 @@ class NewsAdminEditEntryAction extends AbstractAdminFormAction {
 	private $entry;
 
 	public function load() {
-		$this->entry = $this->getModel()->getEntry($this->getRequest()->getParameter(1));
+		$this->entry = $this->getModel()->getEntry($this->getRequest()->getParameter(6));
 	}
 	
 	protected function createForm() {
