@@ -143,4 +143,8 @@ class Design extends Smarty implements ArrayAccess {
 	}
 }
 
+class DesignNotFoundException extends Exception {
+
+}
+
 ?>

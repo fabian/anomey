@@ -454,8 +454,16 @@ class Site extends Model {
 
 	private $designs = array ();
 
-	public function getDesigns() {
-		return $this->designs;
+	public function getDesigns($name = null) {
+		if($name == null) {
+			return $this->designs;
+		} else {
+			if(isset($this->designs[$name])) {
+				return $this->designs[$name];
+			} else {
+				throw new DesignNotFoundException('Design with name "' . $name . '" not found!');
+			}
+		}
 	}
 
 	public function getPath() {
@@ -636,7 +644,7 @@ class Site extends Model {
 		if (isset ($this->index[$id])) {
 			return $this->index[$id];
 		} else {
-			throw new PageNotFoundException('Page with id ' . $id . ' not found!');
+			throw new PageNotFoundException('Page with id "' . $id . '" not found!');
 		}
 	}
 

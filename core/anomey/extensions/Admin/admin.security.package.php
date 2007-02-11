@@ -405,6 +405,7 @@ class AdminSecurityPermissionsChangeAction extends AdminBaseFormAction {
 
 	public function load() {
 		$this->page = $this->getModel()->getPage($this->getRequest()->getParameter(1));
+		$this->getDesign()->assign('title', $this->page->getTitle());
 	}
 
 	protected function createForm() {

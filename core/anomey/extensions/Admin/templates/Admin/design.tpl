@@ -1,4 +1,4 @@
-{layout template="Admin/layout.tpl" title="Designs"}
+{layout template="Admin/layout.tpl" title="Files" middleTitle="Edit design \"`$title`\""}
 
 {capture assign="middle"}
 <ul id="pageNavigation" class="navigation">
@@ -17,19 +17,22 @@
   
 <table>
  <colgroup>
- 	<col width="70%" />
+ 	<col width="45%" />
  	<col width="30%" />
+ 	<col width="25%" />
  </colgroup>
  <thead>
   <tr>
    <th>File</th>
+   <th>Last modified</th>
    <th>Actions</th>
   </tr>
  </thead>
  <tbody>
  {foreach from=$files item=file key=name}
  <tr{cycle values=", class=\"even\""}>
-  <td>{$file}</td>
+  <td>{$file.path}</td>
+  <td>{$file.modified|date_format:"%Y-%m-%d %H:%M"}</td>
   <td><ul class="actions"><li>{link trail="edit/`$name`"}<a href="{$href}" class="action edit">edit</a>{/link}</li>
   <li>{link trail="admin/designs/delete" design=$name}<a href="{$href}" class="action delete">delete</a>{/link}</li>
   </ul></td>

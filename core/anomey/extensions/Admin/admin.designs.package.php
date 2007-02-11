@@ -74,11 +74,11 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 	private $design;
 	
 	protected function load() {
-		$this->design = $this->getRequest()->getPart(2);
-	}
-	
-	protected function getBase() {
-		return '/admin/designs/' . $this->design . '/files';
+		try {
+			$this->design = $this->getModel()->getDesigns($this->getRequest()->getPart(2));
+		} catch(DesignNotFoundException $e) {
+			$this->forward('/admin/designs', new ErrorMessage('Design does not exist!'));
+		}
 	}
 	
 	private function scan($path, $add = '') {
@@ -87,7 +87,7 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 		foreach (scandir($path, 1) as $name) {
 			if(substr($name, 0, 1) != '.') {
 				if(is_file($path . '/'. $name)) {
-					$files[] = $add . $name;
+					$files[] = array('path' => $add . $name, 'modified' =>  filemtime($path . '/' . $name));
 				} elseif (is_dir($path . '/' . $name)) {
 					$files = array_merge($files, $this->scan($path . '/'. $name, $name . '/'));
 				}
@@ -98,9 +98,10 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 	}
 	
 	public function execute() {
-		$path = $this->getSecurity()->getProfile() . '/designs/' . $this->design . '/templates';
+		$path = $this->getSecurity()->getProfile() . '/designs/' . $this->design->getName() . '/templates';
 		$files = $this->scan($path);
 
+		$this->getDesign()->assign('title', $this->design->getTitle());
 		$this->getDesign()->assign('files', $files);
 		$this->getDesign()->display('Admin/design.tpl');
 	}

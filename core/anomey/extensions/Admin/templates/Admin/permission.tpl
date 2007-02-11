@@ -1,4 +1,4 @@
-{layout template="Admin/security.tpl" title="Edit permission"}
+{layout template="Admin/security.tpl" title="Edit permissions of Page \"`$title`\""}
   
   {form}
    {foreach from=$form->getPermissions() item="permission"}
