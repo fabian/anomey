@@ -3,23 +3,23 @@
 /*
  * anomey 2.1 - content management
  * ================================
- * 
- * Copyright (C) 2006 - Adrian Egloff (adrian@anomey.ch), 
+ *
+ * Copyright (C) 2006 - Adrian Egloff (adrian@anomey.ch),
  * Cyril Gabathuler (cyril@anomey.ch) and Fabian Vogler (fabian@anomey.ch)
- * 
+ *
  * This file is part of anomey. For more information about anomey
  * visit http://anomey.ch/ or write a mail to info@anomey.ch.
- * 
+ *
  * anomey is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * anomey is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with anomey (license.txt); if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA
@@ -348,7 +348,7 @@ class AdminSecurityPermissionsAction extends AdminBaseAction implements ActionCo
 	
 	public static function getActions() {
 		return array(
-			'change' => 'AdminSecurityPermissionsChangeAllowUsersAction'
+			'change' => 'AdminSecurityPermissionsChangeAction'
 		);
 	}
 	
@@ -358,9 +358,9 @@ class AdminSecurityPermissionsAction extends AdminBaseAction implements ActionCo
 	}
 }
 
-class AdminSecurityPermissionsChangeAllowUsersForm extends Form {
-	
-	public $who = 'users';
+class AdminSecurityPermissionsChangeForm extends Form {
+
+	public $who = array();
 	
 	public $users = array ();
 	private $allUsers = array ();
@@ -375,17 +375,24 @@ class AdminSecurityPermissionsChangeAllowUsersForm extends Form {
 	public function getAllGroups() {
 		return $this->allGroups;
 	}
+	
+	private $permissions = array();
+	
+	public function getPermissions() {
+		return $this->permissions;
+	}
 
-	public function __construct($allUsers, $allGroups) {
+	public function __construct($allUsers, $allGroups, $permissions) {
 		$this->allUsers = $allUsers;
 		$this->allGroups = $allGroups;
+		$this->permissions = $permissions;
 	}
 	
 	public function validate() {
 	}
 }
 
-class AdminSecurityPermissionsChangeAllowUsersAction extends AdminBaseFormAction {
+class AdminSecurityPermissionsChangeAction extends AdminBaseFormAction {
 	protected function getTemplate() {
 		return 'Admin/permission.tpl';
 	}
@@ -394,10 +401,10 @@ class AdminSecurityPermissionsChangeAllowUsersAction extends AdminBaseFormAction
 		return '/admin/security/permissions';
 	}
 
-	private $permission;
+	private $page;
 
 	public function load() {
-		$this->permission = $this->getModel()->getPage($this->getRequest()->getParameter(1))->getPermission($this->getRequest()->getParameter(2));
+		$this->page = $this->getModel()->getPage($this->getRequest()->getParameter(1));
 	}
 
 	protected function createForm() {
@@ -410,50 +417,63 @@ class AdminSecurityPermissionsChangeAllowUsersAction extends AdminBaseFormAction
 		foreach ($this->getSecurity()->getGroups() as $group) {
 			$allGroups[$group->getId()] = $group->getName();
 		}
+		
+		$permissions = array();
+		foreach ($this->page->getPermissions() as $permission) {
+			$permissions[] = $permission->getName();
+		}
 
-		$form = new AdminSecurityPermissionsChangeAllowUsersForm($allUsers, $allGroups);
+		$form = new AdminSecurityPermissionsChangeForm($allUsers, $allGroups, $permissions);
 
 		return $form;
 	}
+	
+	private function loadUsers() {
+		
+	}
 
 	protected function loadForm(Form $form) {
-		if($this->permission->getEveryone()) {
-			$form->who = 'everyone';
-		} else {
-			$form->who = 'users';
-		}
-
 		$users = array ();
-		foreach ($this->permission->getUsers() as $user) {
-			$users[] = $user->getId();
+		$groups = array ();
+		
+		foreach($this->page->getPermissions() as $permission) {
+			if($permission->getEveryone()) {
+				$form->who[$permission->getName()] = 'everyone';
+			} else {
+				$form->who[$permission->getName()] = 'users';
+			}
+			
+			foreach($permission->getUsers() as $user) {
+				$users[$permission->getName()][] = $user->getId();
+			}
+			
+			foreach($permission->getGroups() as $group) {
+				$groups[$permission->getName()][] = $group->getId();
+			}
 		}
 
 		$form->users = $users;
-
-		$groups = array ();
-		foreach ($this->permission->getGroups() as $group) {
-			$groups[] = $group->getId();
-		}
-
 		$form->groups = $groups;
 	}
 
 	
 	protected function succeed(Form $form) {
-		$this->permission->clear();
-		
-		foreach($form->users as $id) {
-			$this->permission->addUser($this->getSecurity()->getUser($id));
-		}
-		
-		foreach($form->groups as $id) {
-			$this->permission->addGroup($this->getSecurity()->getGroup($id));
-		}
-		
-		if($form->who == 'everyone') {
-			$this->permission->setEveryone(true);
-		} else {
-			$this->permission->setEveryone(false);
+		foreach($this->page->getPermissions() as $permission) {
+			$permission->clear();
+			
+			foreach(Value::get($form->users[$permission->getName()], array()) as $id) {
+				$permission->addUser($this->getSecurity()->getUser($id));
+			}
+			
+			foreach(Value::get($form->groups[$permission->getName()], array()) as $id) {
+				$permission->addGroup($this->getSecurity()->getGroup($id));
+			}
+			
+			if(Value::get($form->who[$permission->getName()], 'everyone') == 'everyone') {
+				$permission->setEveryone(true);
+			} else {
+				$permission->setEveryone(false);
+			}
 		}
 		
 		$this->getSecurity()->save();

@@ -395,11 +395,19 @@ a.action.add_design {
 }
 
 a.action.add_user_permission {
-	background-image: url("icons/user_key.png");
+	background-image: url("../images/icons/user_key.png");
 }
 
-a.action.add_group_permission {
-	background-image: url("icons/group_key.png");
+a.action.add_group_permission {../images/
+	background-image: url("../images/icons/group_key.png");
+}
+
+a.action.copy {
+	background-image: url("../images/icons/page_white_copy.png");
+}
+
+a.action.upload {
+	background-image: url("../images/icons/page_white_get.png");
 }
 
 #messages {

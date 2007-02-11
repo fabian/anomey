@@ -596,9 +596,25 @@ class Request extends Bean {
 	public function getTrail() {
 		return $this->trail;
 	}
+	
+	private $parts = array();
+	
+	public function getParts() {
+		return $this->parts;
+	}
+	
+	public function getPart($id) {
+		return $this->parts[$id];
+	}
 
 	public function setTrail($trail) {
 		$this->trail = $trail;
+		
+		if(substr($trail, 0, 1) == '/') {
+			// remove leading slash
+			$trail = substr($trail, 1);
+		}
+		$this->parts = explode('/', $trail);
 	}
 
 	private $session;
@@ -653,7 +669,7 @@ class Request extends Bean {
 	public function __construct($user, $method, $trail, Session $session, Cookie $cookie, $parameters = array (), $messages = array ()) {
 		$this->user = $user;
 		$this->method = $method;
-		$this->trail = $trail;
+		$this->setTrail($trail);
 		$this->session = $session;
 		$this->cookie = $cookie;
 		$this->parameters = $parameters;

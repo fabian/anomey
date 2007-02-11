@@ -81,15 +81,25 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 		return '/admin/designs/' . $this->design . '/files';
 	}
 	
-	public function execute() {
-		$files = array();		
-
-		$path = $this->getSecurity()->getProfile() . '/designs/' . $this->design . '/templates';
-		foreach (scandir($path) as $name) {
-			if(is_file($path . '/'. $name)) {
-				$files[] = $name;
+	private function scan($path, $add = '') {
+		$files = array();
+		
+		foreach (scandir($path, 1) as $name) {
+			if(substr($name, 0, 1) != '.') {
+				if(is_file($path . '/'. $name)) {
+					$files[] = $add . $name;
+				} elseif (is_dir($path . '/' . $name)) {
+					$files = array_merge($files, $this->scan($path . '/'. $name, $name . '/'));
+				}
 			}
 		}
+		
+		return $files;
+	}
+	
+	public function execute() {
+		$path = $this->getSecurity()->getProfile() . '/designs/' . $this->design . '/templates';
+		$files = $this->scan($path);
 
 		$this->getDesign()->assign('files', $files);
 		$this->getDesign()->display('Admin/design.tpl');

@@ -11,7 +11,7 @@
  {link trail="admin/designs/add"}<ul id="actions">
   <li><a href="{$href}" class="action add_file">Create file</a></li>
   <li><a href="{$href}" class="action copy">Copy file</a></li>
-  <li><a href="{$href}" class="action add_file">Upload file</a></li>
+  <li><a href="{$href}" class="action upload">Upload file</a></li>
  </ul>{/link}
 {/capture}
   
