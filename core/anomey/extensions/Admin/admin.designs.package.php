@@ -67,14 +67,14 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 
 	public static function getActions() {
 		return array(
-			//URI::CHARS . '*' => 'AdminDesignsFileAction'
+			URI::CHARS . '*' => 'AdminDesignsFileAction'
 		);
 	}
 
 	private $design;
 	
 	protected function load() {
-		$this->design = $this->getRequest()->getParameter(-1);
+		$this->design = $this->getRequest()->getPart(2);
 	}
 	
 	protected function getBase() {
@@ -82,7 +82,6 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 	}
 	
 	public function execute() {
-		var_dump($this->design);
 		$files = array();		
 
 		$path = $this->getSecurity()->getProfile() . '/designs/' . $this->design . '/templates';
@@ -97,12 +96,15 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 	}
 }
 
-/*class AdminDesignsFileAction extends AdminBaseFormAction {
+class AdminDesignsFileAction extends AdminBaseAction {
 
 	private $design;
 	
+	private $file;
+	
 	protected function load() {
-		$this->design = $this->getRequest()->getParameter(0);
+		$this->design = $this->getRequest()->getPart(2);
+		$this->file = $this->getRequest()->getPart(4);
 	}
 	
 	protected function getBase() {
@@ -112,7 +114,8 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 	public function execute() {
 		echo 'File!';
 		var_dump($this->design);
+		var_dump($this->file);
 	}
-}*/
+}
 
 ?>
