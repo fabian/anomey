@@ -87,7 +87,7 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 		foreach (scandir($path, 1) as $name) {
 			if(substr($name, 0, 1) != '.') {
 				if(is_file($path . '/'. $name)) {
-					$files[] = array('path' => $add . $name, 'modified' =>  filemtime($path . '/' . $name));
+					$files[] = array('path' => $add . $name, 'encoded' => URI::encode($add . $name), 'modified' =>  filemtime($path . '/' . $name));
 				} elseif (is_dir($path . '/' . $name)) {
 					$files = array_merge($files, $this->scan($path . '/'. $name, $name . '/'));
 				}
@@ -102,12 +102,59 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 		$files = $this->scan($path);
 
 		$this->getDesign()->assign('title', $this->design->getTitle());
+		$this->getDesign()->assign('name', $this->design->getName());
 		$this->getDesign()->assign('files', $files);
 		$this->getDesign()->display('Admin/design.tpl');
 	}
 }
 
-class AdminDesignsFileAction extends AdminBaseAction {
+class AdminDesignsFileForm extends Form {
+
+	public $file;
+	
+	public $contentOfFile;
+	
+	public $confirmed = 'false';
+	
+	private $profile;
+	
+	private $design;
+	
+	private $orig;
+	
+	public function getPath() {
+		return $this->profile . '/designs/' . $this->design . '/templates/' . $this->file;
+	}
+	
+	public function getOrig() {
+		return $this->orig;
+	}
+	
+	public function getOrigPath() {
+		return $this->profile . '/designs/' . $this->design . '/templates/' . $this->orig;
+	}
+	
+	public function __construct($profile, $design, $orig) {
+		$this->profile = $profile;
+		$this->design = $design;
+		$this->orig = $orig;
+	}
+	
+	public function validate() {
+		if(file_exists($this->getPath())) {
+			$this->assertTrue(is_writable($this->getPath()), new ErrorMessage('You don\'t have the permission to edit this file.'));
+		}
+		
+		if($this->file != $this->orig and file_exists($this->getPath()) and $this->confirmed != 'true') {
+			$this->addError(new WarningMessage('There is already a file with this filename. Click again "Save changes" to override the file.'));
+			$this->confirmed = 'true';
+		} else {
+			$this->confirmed = 'false';
+		}
+	}
+}
+
+class AdminDesignsFileAction extends AdminBaseFormAction {
 
 	private $design;
 	
@@ -115,17 +162,40 @@ class AdminDesignsFileAction extends AdminBaseAction {
 	
 	protected function load() {
 		$this->design = $this->getRequest()->getPart(2);
-		$this->file = $this->getRequest()->getPart(4);
+		$this->file = URI::decode($this->getRequest()->getPart(4));
 	}
 	
-	protected function getBase() {
-		return '/admin/designs';
+
+	public function getTemplate() {
+		return 'Admin/designFile.tpl';
 	}
-	
-	public function execute() {
-		echo 'File!';
-		var_dump($this->design);
-		var_dump($this->file);
+
+	protected function getReturn() {
+		return 'admin/designs/' . $this->design . '/files';
+	}
+
+	protected function createForm() {
+		return new AdminDesignsFileForm($this->getSecurity()->getProfile(), $this->design, $this->file);
+	}
+
+	protected function loadForm(Form $form) {
+		$form->file = $this->file;
+		$form->contentOfFile = HTML::specialchars(file_get_contents($form->getPath()));
+		if(!is_writable($form->getPath())) {
+			$this->getRequest()->addMessage(new WarningMessage('You don\'t have the permission to edit this file.'));
+		}
+	}
+
+	public function succeed(Form $form) {
+		if(!file_put_contents($form->getPath(), HTML::decodeSpecialchars($form->contentOfFile))) {
+			return new ErrorMessage('Could not save file!');
+		} else {
+			if($form->file != $form->getOrig()) {
+				// remove old file
+				unlink($form->getOrigPath());
+			}
+			return new Message('Changes saved!');
+		}
 	}
 }
 

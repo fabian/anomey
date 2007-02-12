@@ -199,6 +199,14 @@ class URI extends Bean {
 	public function getFull() {
 		return $this->toString();
 	}
+	
+	public static function encode($string) {
+		return rtrim(strtr(base64_encode($string), '+/', '-_'), '=');   
+	}
+	
+	public static function decode($string) {
+		return base64_decode(strtr($string, '-_', '+/') . '=');   
+	}
 }
 
 class URL extends URI {

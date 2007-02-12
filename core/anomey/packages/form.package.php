@@ -32,88 +32,92 @@ require_once 'action.package.php';
 abstract class Form extends Bean {
 
 	private $errors = array ();
+	
+	public function addError(Message $error) {
+		$this->errors[] = $error;
+	}
 
 	public function offsetGet($key) {
 		return $this->$key;
 	}
 
-	protected function assertNotEmpty($value, $error) {
+	protected function assertNotEmpty($value, Message $error) {
 		if ($value == '') {
-			$this->errors[] = $error;
+			$this->addError($error);
 			return false;
 		} else {
 			return true;
 		}
 	}
 
-	protected function assertNotNull($value, $error) {
+	protected function assertNotNull($value, Message $error) {
 		if ($value == '') {
-			$this->errors[] = $error;
+			$this->addError($error);
 			return false;
 		} else {
 			return true;
 		}
 	}
 
-	protected function assertEqual($value, $value2, $error) {
+	protected function assertEqual($value, $value2, Message $error) {
 		if ($value != $value2) {
-			$this->errors[] = $error;
+			$this->addError($error);
 			return false;
 		} else {
 			return true;
 		}
 	}
 
-	protected function assertTrue($condition, $error) {
+	protected function assertTrue($condition, Message $error) {
 		if (!$condition) {
-			$this->errors[] = $error;
+			$this->addError($error);
 			return false;
 		} else {
 			return true;
 		}
 	}
 
-	protected function assertFalse($condition, $error) {
+	protected function assertFalse($condition, Message $error) {
 		if ($condition) {
-			$this->errors[] = $error;
+			$this->addError($error);
 			return false;
 		} else {
 			return true;
 		}
 	}
 
-	protected function assertNumeric($value, $error) {
+	protected function assertNumeric($value, Message $error) {
 		if (is_numeric($value)) {
 			return true;
 		} else {
-			$this->errors[] = $error;
+			$this->addError($error);
 			return false;
 		}
 	}
 
-	protected function assertRegEx($value, $expression, $error) {
+	protected function assertRegEx($value, $expression, Message $error) {
 		if (!preg_match($expression, $value)) {
-			$this->errors[] = $error;
+			$this->addError($error);
 			return false;
 		} else {
 			return true;
 		}
 	}
 
-	protected function assertInList($value, $list, $error) {
+	protected function assertInList($value, $list, Message $error) {
 		if (array_search($value, $list) === false) {
-			$this->errors[] = $error;
+			$this->addError($error);
 			return false;
 		} else {
 			return true;
 		}
 	}
 
-	protected function assertNotInList($value, $list, $error) {
+	protected function assertNotInList($value, $list, Message $error) {
 		if (array_search($value, $list) === false) {
 			return true;
 		} else {
-			$this->errors[] = $error;
+			$this->addError($error);
 			return false;
 		}
 	}
@@ -155,10 +159,6 @@ abstract class FormAction extends Action {
 
 	protected abstract function succeed(Form $form);
 
-	protected function load() {
-
-	}
-
 	protected function getReturn() {
 		return $this->getRequest()->getTrail();
 	}
@@ -182,7 +182,7 @@ abstract class FormAction extends Action {
 	}
 
 	public final function execute() {
-		$this->load();
+		$this->load(); // TODO check if this is needed
 		$this->form = $this->createForm();
 
 		if ($this->getRequest()->getParameter('cancel', false) !== false) {

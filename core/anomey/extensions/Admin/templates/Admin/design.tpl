@@ -29,11 +29,11 @@
   </tr>
  </thead>
  <tbody>
- {foreach from=$files item=file key=name}
+ {foreach from=$files item=file}
  <tr{cycle values=", class=\"even\""}>
   <td>{$file.path}</td>
   <td>{$file.modified|date_format:"%Y-%m-%d %H:%M"}</td>
-  <td><ul class="actions"><li>{link trail="edit/`$name`"}<a href="{$href}" class="action edit">edit</a>{/link}</li>
+  <td><ul class="actions"><li>{link trail="admin/designs/`$name`/files/`$file.encoded`"}<a href="{$href}" class="action edit">edit</a>{/link}</li>
   <li>{link trail="admin/designs/delete" design=$name}<a href="{$href}" class="action delete">delete</a>{/link}</li>
   </ul></td>
  </tr>
