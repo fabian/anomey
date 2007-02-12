@@ -4,17 +4,32 @@
 	<property name="version" value="2.1.0" />
 	<property name="build" value="build" />
 	<property name="excludes" value="profiles/**, build/**, build.xml, build-anomey.launch, .project" />
+	<property name="framework" value="core/anomey/extensions/Admin/**" />
 
 	<target name="init">
 		<mkdir dir="${build}" />
 	</target>
 
-	<target name="default" depends="init">
+	<target name="default">
+		<antcall target="full" />
+		<antcall target="framework" />
+	</target>
+
+	<target name="full" depends="init">
 		<zip destfile="${build}/anomey-${version}.zip">
 			<zipfileset dir="." prefix="anomey" excludes="${excludes}" />
 		</zip>
 		<tar destfile="${build}/anomey-${version}.tar.gz" compression="gzip">
 			<tarfileset dir="." prefix="anomey" excludes="${excludes}" />
+		</tar>
+	</target>
+
+	<target name="framework" depends="init">
+		<zip destfile="${build}/anomey-framework-${version}.zip">
+			<zipfileset dir="." prefix="anomey" excludes="${excludes}, ${framework}" />
+		</zip>
+		<tar destfile="${build}/anomey-framework-${version}.tar.gz" compression="gzip">
+			<tarfileset dir="." prefix="anomey" excludes="${excludes}, ${framework}" />
 		</tar>
 	</target>
 
