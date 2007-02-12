@@ -7,7 +7,7 @@
 		<link rel="stylesheet" type="text/css" href="{resource file="stylesheets/screen.css"}" />
 	    {$header}
 	    {if $mootools or $slimbox}
-	    <script type="text/javascript" src="{resource file="javascript/mootools.release.83.js"}"></script>
+	    <script type="text/javascript" src="{resource file="javascript/mootools.v1.00.js"}"></script>
 	    {if $slimbox}
 		<link rel="stylesheet" href="{resource file="stylesheets/slimbox.css"}" type="text/css" media="screen" />
 		<script type="text/javascript" src="{resource file="javascript/slimbox.js"}"></script>

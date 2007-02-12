@@ -8,7 +8,7 @@
 	cursor: pointer;
 }
 
-#lbCenter, #lbBottom {
+#lbCenter, #lbBottomContainer {
 	position: absolute;
 	left: 50%;
 	overflow: hidden;
