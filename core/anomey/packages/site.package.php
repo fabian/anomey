@@ -601,7 +601,6 @@ class Site extends Model {
 			$xml = $parent->addChild('page');
 			$xml->addAttribute('id', $module->getId());
 			$xml->addAttribute('title', $module->getTitle());
-			$xml->addAttribute('type', get_class($module));
 			$xml->addAttribute('name', $module->getName());
 			$xml->addAttribute('modified', $module->getModified());
 
@@ -657,7 +656,6 @@ class Site extends Model {
 
 		foreach ($elements as $element) {
 			$id = (string) $element['id'];
-			$type = (string) $element['type'];
 			$name = (string) $element['name'];
 			$modified = (string) $element['modified'];
 			$title = (string) $element['title'];

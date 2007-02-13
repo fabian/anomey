@@ -42,7 +42,6 @@
 	
 	public function setUrl($url) {
 		$this->url = $url;
-		$this->setModifiedNow();
 	}
 
 	public function getUrl() {
@@ -112,6 +111,9 @@ class JoinAdminAction extends AbstractDefaultAdminFormAction implements Protecte
 	public function save(Form $form) {
 		$this->getModel()->setUrl($form->url);
 		$this->getModel()->save();
+		
+		$this->getModel()->setModifiedNow();
+		$this->getModel()->getSite()->save();
 		
 		return new Message('Changes on join saved!');
 	}

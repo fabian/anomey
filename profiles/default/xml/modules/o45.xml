@@ -1,4 +1,4 @@
-<?xml version="1.0" ?>
-<module>
-	<content>The requested page could not be found.</content>
-</module>
+<?xml version="1.0"?>
+<page>
+  <content>The requested page could not be found.</content>
+</page>

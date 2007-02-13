@@ -1,11 +1,11 @@
 <?php
 
 class EntryNotFoundException extends Exception {
-	
+
 }
 
 class News extends Module {
-	
+
 	private $nextId = 1;
 	
 	public function getAuthor() {
@@ -103,7 +103,9 @@ class News extends Module {
 		$xml = XML :: create('news');
 		$xml->addAttribute('nextid', $this->nextId);
 		$xml->addChild('preface', $this->getPreface());
+		
 		$this->setModified(date($this->getLastModified(), 'Y-m-d'));
+		$this->getSite()->save();
 		
 		foreach ($this->getAllPublications() as $publication) {
 			foreach ($publication as $entry) {

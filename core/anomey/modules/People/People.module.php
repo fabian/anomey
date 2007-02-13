@@ -164,8 +164,10 @@ class PeopleAdminAction extends AbstractDefaultAdminFormAction implements Protec
 		$this->getModel()->setDisplay($form->displayMode);
 		$this->getModel()->setOrder($form->order);
 		$this->getModel()->setPreface($form->preface);
-		$this->getModel()->setModifiedNow();
 		$this->getModel()->save();
+		
+		$this->getModel()->setModifiedNow();
+		$this->getModel()->getSite()->save();
 		
 		return new Message('Changes on page saved!');
 	}

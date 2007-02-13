@@ -43,7 +43,6 @@ class Text extends Module {
 	
 	public function setContent($content) {
 		$this->content = $content;
-		$this->setModifiedNow();
 	}
 
 	public function getContent() {
@@ -131,6 +130,9 @@ class TextAdminContentAction extends AbstractAdminFormAction implements Protecte
 	public function succeed(Form $form) {		
 		$this->getModel()->setContent($form->contentOfPage);
 		$this->getModel()->save();
+		
+		$this->getModel()->setModifiedNow();
+		$this->getModel()->getSite()->save();
 
 		return new Message('Changes saved!');
 	}
