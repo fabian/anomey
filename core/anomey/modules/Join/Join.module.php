@@ -42,7 +42,7 @@
 	
 	public function setUrl($url) {
 		$this->url = $url;
-		$this->getModel()->setChangedNow();
+		$this->setModifiedNow();
 	}
 
 	public function getUrl() {
