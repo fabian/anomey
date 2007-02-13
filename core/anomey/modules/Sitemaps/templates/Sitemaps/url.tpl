@@ -5,5 +5,5 @@
 	<lastmod>{$page.modified}</lastmod>
 </url>
 {/link}
-{include file="GoogleSitemap/url.tpl" pages=$page.childs}
+{include file="Sitemaps/url.tpl" pages=$page.childs}
 {/foreach}

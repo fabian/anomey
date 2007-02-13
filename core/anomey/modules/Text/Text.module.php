@@ -43,7 +43,7 @@ class Text extends Module {
 	
 	public function setContent($content) {
 		$this->content = $content;
-		$this->getModel()->setChangedNow();
+		$this->setModifiedNow();
 	}
 
 	public function getContent() {
