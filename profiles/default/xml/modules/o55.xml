@@ -1,31 +1,39 @@
 <?xml version="1.0"?>
-<news nextid="12">
+<news nextid="18">
+  <preface>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.</preface>
   <entry>
     <id>e11</id>
-    <title>Test</title>
+    <title>Test 2</title>
+    <name>test</name>
     <content>Foobar</content>
     <publication>2006-11-14T08:51:00+01:00</publication>
-    <author>u1</author>
+    <created>2007-02-05T16:00:00+01:00</created>
   </entry>
   <entry>
     <id>e7</id>
     <title>Foobar</title>
+    <name>foobar</name>
     <content>Zweiter Eintrag.</content>
     <publication>2006-11-11T02:02:00+01:00</publication>
+    <created>2007-02-05T15:00:00+01:00</created>
     <author>u1</author>
   </entry>
   <entry>
     <id>e8</id>
     <title>Erster Eintrag</title>
+    <name>erster-eintrag</name>
     <content>Oder so..</content>
     <publication>2002-11-11T02:06:00+01:00</publication>
+    <created>2007-02-05T14:00:00+01:00</created>
     <author>u1</author>
   </entry>
   <entry>
     <id>e10</id>
     <title>Foo</title>
+    <name></name>
     <content>Hallo [Link to home](page:/home).</content>
     <publication>2001-11-11T14:33:00+01:00</publication>
+    <created>2007-02-05T13:00:00+01:00</created>
     <author>u1</author>
   </entry>
 </news>

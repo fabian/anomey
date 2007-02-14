@@ -581,6 +581,10 @@ class Site extends Model {
 	public function getAvaibleModules() {
 		return $this->modules;
 	}
+	
+	public function canSave() {
+		return is_writable($this->sitemap);
+	}
 
 	public function save() {
 		$this->store->save();
@@ -593,7 +597,7 @@ class Site extends Model {
 
 		$this->createXML($xml, $this->getChilds());
 
-		$xml->save($this->sitemap);
+		return $xml->save($this->sitemap);
 	}
 
 	private function createXML(SimpleXMLElement $parent, $modules) {

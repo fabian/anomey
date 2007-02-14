@@ -13,7 +13,7 @@
 {foreach from=$model.publications item=publication}
 {foreach from=$publication item=entry}
 	<entry>
-		<id>tag:{$processor.url.host},{$entry.publication|date:"Y-m-d"}:{$entry.id}</id>
+		<id>tag:{$processor.url.host},{$entry.created|date:"Y-m-d"}:{$entry.id}</id>
 		<title>{$entry.title}</title>
 		<published>{$entry.publication|date}</published>
 		<updated>{$entry.publication|date}</updated>

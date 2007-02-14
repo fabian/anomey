@@ -81,13 +81,14 @@ class News extends Module {
 			} catch (UserNotFoundException $e) {
 				$author = null;
 			}
-			$this->entries->set((string) $entry->id, new NewsEntry((string) $entry->id, (string) $entry->title, (string) $entry->content, (string) $entry->publication, $author));
+			$this->entries->set((string) $entry->id, new NewsEntry((string) $entry->id, (string) $entry->title, (string) $entry->name, (string) $entry->content, (string) $entry->publication, (string) $entry->created, $author));
 		}
 	}
 
 	public function add($title, $content, $publication, $author) {
 		$id = 'e'.$this->nextId++;
-		$entry = new NewsEntry($id, $title, $content, $publication, $author);
+		$name = trim(preg_replace('/([^a-z-_])/', '', strtr(strtolower(HTML::decodeSpecialchars($title)), array(' ' => '-', '<' => '-', '>' => '-', 'ä' => 'ae', 'ö' => 'oe', 'ü' => 'ue'))), ' -');
+		$entry = new NewsEntry($id, $title, $name, $content, $publication, date('c'), $author);
 		$this->entries->set($id, $entry);
 	}
 
@@ -104,7 +105,7 @@ class News extends Module {
 		$xml->addAttribute('nextid', $this->nextId);
 		$xml->addChild('preface', $this->getPreface());
 		
-		$this->setModified(date($this->getLastModified(), 'Y-m-d'));
+		$this->setModified(date('Y-m-d', $this->getLastModified()));
 		$this->getSite()->save();
 		
 		foreach ($this->getAllPublications() as $publication) {
@@ -112,8 +113,10 @@ class News extends Module {
 				$child = $xml->addChild('entry');
 				$child->addChild('id', $entry->getId());
 				$child->addChild('title', HTML :: specialchars($entry->getTitle()));
+				$child->addChild('name', HTML :: specialchars($entry->getName()));
 				$child->addChild('content', $entry->getContent());
 				$child->addChild('publication', date('c', $entry->getPublication()));
+				$child->addChild('created', date('c', $entry->getCreated()));
 				if($entry->getAuthor() != null) {
 					$child->addChild('author', $entry->getAuthor()->getId());
 				}
@@ -166,8 +169,10 @@ class NewsAddEntryAction extends FormAction implements ProtectedAction {
 class NewsEntry extends Bean {
 	private $id = '';
 	private $title = '';
+	private $name = '';
 	private $content = '';
 	private $publication = '';
+	private $created = '';
 	private $author = null;
 	
 	public function getId() {
@@ -176,6 +181,10 @@ class NewsEntry extends Bean {
 
 	public function getTitle() {
 		return $this->title;
+	}
+	
+	public function getName() {
+		return $this->name;
 	}
 
 	public function getContent() {
@@ -186,15 +195,21 @@ class NewsEntry extends Bean {
 		return $this->publication;
 	}
 	
+	public function getCreated() {
+		return $this->created;
+	}
+	
 	public function getAuthor() {
 		return $this->author;
 	}
 
-	public function __construct($id, $title, $content, $publication, $author) {
+	public function __construct($id, $title, $name, $content, $publication, $created, $author) {
 		$this->id = $id;
 		$this->title = $title;
+		$this->name = $name;
 		$this->content = $content;
 		$this->publication = strtotime($publication);
+		$this->created = strtotime($created);
 		$this->author = $author;
 	}
 }
@@ -249,19 +264,47 @@ class NewsAdminAction extends AbstractAdminAction implements ActionContainer {
 	}
 }
 
-class NewsAdminEntriesAction extends AbstractAdminAction implements ActionContainer {
+class NewsAdminForm extends Form {
+
+	public $toDelete = array();
+
+	public function validate() {
+		$this->assertTrue(count($this->toDelete) > 0, new ErrorMessage('Please select at least one entry to delete.'));
+	}
+}
+
+class NewsAdminEntriesAction extends AbstractAdminFormAction implements ActionContainer {
 	
 	public static function getActions() {
 		return array (
 			'edit' => 'NewsAdminEditEntryAction',
-			'add' => 'NewsAdminAddEntryAction',
-			'delete' => 'NewsAdminDeleteEntryAction'
+			'add' => 'NewsAdminAddEntryAction'
 		);
 	}
-
-	public function execute() {
+	
+	public function getTemplate() {
+		return 'Admin/News/entries.tpl';
+	}
+	
+	public function load() {
 		$this->getDesign()->assign('publications', $this->getModel()->getAllPublications());
-		$this->getDesign()->display('Admin/News/entries.tpl');
+	}
+	
+	public function createForm() {
+		return new NewsAdminForm();
+	}
+	
+	public function succeed(Form $form) {
+		foreach($form->toDelete as $id) {
+			try {
+				$this->getModel()->delete($id);
+			} catch(PageNotFoundException $e) {
+				// ignore
+			}
+		}
+		$this->getModel()->save();
+		
+		return new Message('Selected entries(s) deleted.');
 	}
 }
 
@@ -336,15 +379,6 @@ class NewsAdminAddEntryAction extends AbstractAdminFormAction {
 		$this->getModel()->save();
 
 		return new Message('Entry created!');
-	}
-}
-
-class NewsAdminDeleteEntryAction extends AbstractAdminAction {
-	public function execute() {
-		$id = $this->getRequest()->getParameter('id');
-		$this->getModel()->delete($id);
-		$this->getModel()->save();
-		$this->forward('', new Message('Entry deleted!'));
 	}
 }
 

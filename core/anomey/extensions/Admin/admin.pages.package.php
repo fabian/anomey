@@ -89,6 +89,12 @@ abstract class AbstractAdminForm extends Form {
 
 	public $neighbours = array(); // TODO should be private (get-/setter)
 	
+	private $site;
+	
+	public function setSite(Site $site) {
+		$this->site = $site;
+	}
+	
 	public function buildTree(Model $model, $count = 0) {
 		if ($model->getId() != $this->id) {
 			if($model instanceof Site) {
@@ -106,6 +112,7 @@ abstract class AbstractAdminForm extends Form {
 	}
 
 	public function validate() {
+		$this->assertTrue($this->site->canSave(), new ErrorMessage('Can\'t save settings. Please check file permissions.'));
 		$this->assertNotEmpty($this->title, new ErrorMessage('Please type in a title.'));
 		if ($this->assertNotEmpty($this->name, new ErrorMessage('Please type in a name.'))) {
 			if ($this->assertRegEx($this->name, '/^' . URI::CHARS . '*$/', new ErrorMessage('The name may consists only of letters, digits, hyphens and underlines.'))) {
@@ -164,6 +171,7 @@ abstract class AbstractDefaultAdminFormAction extends AbstractAdminFormAction im
 		}
 		$form->neighbours = $neighbours;
 		$form->buildTree($this->getModel()->getSite());
+		$form->setSite($this->getModel()->getSite());
 		
 		return $form;
 	}
@@ -205,7 +213,7 @@ abstract class AbstractDefaultAdminFormAction extends AbstractAdminFormAction im
 		} else {
 			$this->getModel()->setHide(false);
 		}
-
+		
 		$site->save();
 		
 		return $this->save($form);
