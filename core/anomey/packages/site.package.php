@@ -646,6 +646,18 @@ class Site extends Model {
 			throw new PageNotFoundException('Page with id "' . $id . '" not found!');
 		}
 	}
+	
+	public function deletePage(Module $page) {
+		// delete childs
+		foreach($page->getChilds() as $child) {
+			$this->deletePage($child);
+		}
+		
+		$page->getParent()->removeChild($page->getName());
+		$page->remove();
+		
+		$this->store->removeObject($page->getId());
+	}
 
 	public function createIndex(SimpleXMLElement $xml, Model $parent) {
 		// add parent model to index

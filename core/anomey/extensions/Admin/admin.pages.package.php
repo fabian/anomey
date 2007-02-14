@@ -26,21 +26,50 @@
  * or visit http://www.gnu.org/copyleft/gpl.html.
  */
 
-class AdminPagesAction extends AdminBaseAction implements ActionContainer {
+class AdminPagesForm extends Form {
+
+	public $toDelete = array();
+
+	public function validate() {
+		$this->assertTrue(count($this->toDelete) > 0, new ErrorMessage('Please select at least one page to delete.'));
+	}
+}
+
+class AdminPagesAction extends AdminBaseFormAction implements ActionContainer {
 
 	public static function getActions() {
 		return array (
 			'o[0-9]*' => 'AdminPageEditAction',
 			'up' => 'AdminPageUpAction',
 			'down' => 'AdminPageDownAction',
-			'delete' => 'AdminPageDeleteAction',
 			'new' => 'AdminPageCreateNewAction'
 		);
 	}
 	
-	public function execute() {
+	public function getTemplate() {
+		return 'Admin/pages.tpl';
+	}
+	
+	public function load() {
 		$this->getDesign()->assign('pages', $this->getModel()->getChilds());
-		$this->getDesign()->display('Admin/pages.tpl');
+	}
+	
+	public function createForm() {
+		return new AdminPagesForm();
+	}
+	
+	public function succeed(Form $form) {
+		foreach($form->toDelete as $id) {
+			try {
+				$page = $this->getModel()->getPage($id);
+				$this->getModel()->deletePage($page);
+			} catch(PageNotFoundException $e) {
+				// ignore
+			}
+		}
+		$this->getModel()->save();
+		
+		return new Message('Selected page(s) deleted.');
 	}
 }
 
@@ -250,17 +279,6 @@ class AdminPageDownAction extends AdminBaseAction {
 		$this->getModel()->save();
 
 		$this->forward('/admin/pages', new Message('Page moved down!'));
-	}
-}
-
-class AdminPageDeleteAction extends AdminBaseAction {
-	public function execute() {
-		$page = $this->getModel()->getPage($this->getRequest()->getParameter('page'));
-		$page->getParent()->removeChild($page->getName());
-		$page->remove();
-		$this->getModel()->save();
-
-		$this->forward('/admin/pages', new Message('Page deleted!'));
 	}
 }
 

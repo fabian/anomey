@@ -28,7 +28,13 @@
 
 function smarty_function_submit($params, &$smarty)
 {
-    return '<input type="hidden" id="submit" name="submit" value="true" /><input type="submit" value="'.$params['value'].'" class="submit" />';
+	if(isset($params['class'])) {
+		$class = ' ' . $params['class'];
+	} else {
+		$class = ''; 
+	}
+	
+    return '<input type="hidden" id="submit" name="submit" value="true" /><input type="submit" value="'.$params['value'].'" class="submit' . $class . '" />';
 }
 
 ?>

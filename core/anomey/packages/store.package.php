@@ -72,6 +72,12 @@ class Store {
 		}
 	}
 	
+	public function removeObject($id) {
+		if(isset($this->objects[$id])) {
+			unset($this->objects[$id]);
+		}
+	}
+	
 	private $extensions = array();
 	
 	public function getExtensions() {

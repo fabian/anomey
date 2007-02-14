@@ -578,6 +578,10 @@ class SiteLink extends Link {
 }
 
 class Request extends Bean {
+	
+	const METHOD_GET = 'GET';
+	
+	const METHOD_POST = 'POST';
 
 	private $user;
 

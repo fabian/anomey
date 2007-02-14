@@ -188,10 +188,10 @@ abstract class FormAction extends Action {
 		if ($this->getRequest()->getParameter('cancel', false) !== false) {
 			$this->cancel();
 		} else {
-			if ($this->getRequest()->getParameter('submit', false) !== false) {
+			if ($this->getRequest()->getParameter('submit', false) !== false && 
+				$this->getRequest()->getMethod() == Request::METHOD_POST) {
 
 				// Fill form values with parameter
-				// TODO: only use POST here for security reasons
 				$parameters = $this->getRequest()->getParameters();
 				foreach ($this->form as $key => $value) {
 					if (isset ($parameters[$key])) {
