@@ -139,7 +139,7 @@ class FileSytem {
 
 class URI extends Bean {
 	
-	const CHARS = '[-_\/a-zA-Z0-9]';
+	const CHARS = '[-_\/a-zA-Z0-9\.]';
 	
 	private $scheme = '';
 	
