@@ -18,3 +18,5 @@ anomey 2.1.0
 - new module: "GoogleSitemap"
 - added Module::getModified()
 - added WebAction::getContentType()
+- added Processor::isRelativeTrail()
+- added Form::assertNotEqual()
