@@ -44,7 +44,8 @@ class AdminDesignsDesignAction extends AdminBaseAction implements ActionContaine
 
 	public static function getActions() {
 		return array(
-			'files' => 'AdminDesignsFilesAction'
+			'files' => 'AdminDesignsFilesAction',
+			'settings' => 'AdminDesignsSettingsAction'
 		);
 	}	
 
@@ -97,12 +98,18 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 		return $files;
 	}
 	
+	/**
+	 * @override
+	 */
+	protected function getBase() {
+		return '/admin/designs/' . $this->design->getName();
+	}
+	
 	public function execute() {
 		$path = $this->getSecurity()->getProfile() . '/designs/' . $this->design->getName() . '/templates';
 		$files = $this->scan($path);
 
-		$this->getDesign()->assign('title', $this->design->getTitle());
-		$this->getDesign()->assign('name', $this->design->getName());
+		$this->getDesign()->assign('design', $this->design);
 		$this->getDesign()->assign('files', $files);
 		$this->getDesign()->display('Admin/design.tpl');
 	}
@@ -161,7 +168,12 @@ class AdminDesignsFileAction extends AdminBaseFormAction {
 	private $file;
 	
 	protected function load() {
-		$this->design = $this->getRequest()->getPart(2);
+		try {
+			$this->design = $this->getModel()->getDesigns($this->getRequest()->getPart(2));
+		} catch(DesignNotFoundException $e) {
+			$this->forward('/admin/designs', new ErrorMessage('Design does not exist!'));
+		}
+		$this->getDesign()->assign('design', $this->design);
 		$this->file = URI::decode($this->getRequest()->getPart(4));
 	}
 	
@@ -170,12 +182,15 @@ class AdminDesignsFileAction extends AdminBaseFormAction {
 		return 'Admin/designFile.tpl';
 	}
 
-	protected function getReturn() {
-		return 'admin/designs/' . $this->design . '/files';
-	}
-
 	protected function createForm() {
-		return new AdminDesignsFileForm($this->getSecurity()->getProfile(), $this->design, $this->file);
+		return new AdminDesignsFileForm($this->getSecurity()->getProfile(), $this->design->getName(), $this->file);
+	}
+	
+	/**
+	 * @override
+	 */
+	protected function getBase() {
+		return '/admin/designs/' . $this->design->getName();
 	}
 
 	protected function loadForm(Form $form) {
@@ -196,6 +211,88 @@ class AdminDesignsFileAction extends AdminBaseFormAction {
 			}
 			return new Message('Changes saved!');
 		}
+	}
+}
+
+class AdminDesignsSettingsForm extends Form {
+
+	public $name = '';
+	
+	public $title = '';
+	
+	public $author = '';
+	
+	public $license = '';
+	
+	private $orig;
+	
+	private $designs = array();
+	
+	public function getOrig() {
+		return $this->orig;
+	}
+	
+	public function getDesigns() {
+		return $this->designs;
+	}
+	
+	public function __construct($orig, $designs) {
+		$this->orig = $orig;
+		$this->designs = $designs;
+	}
+	
+	public function validate() {
+		if($this->assertNotEmpty($this->name, new ErrorMessage('Please type in a name.'))) {		
+			if($this->name != $this->getOrig()) {
+				$this->asserNotInList($this->name, $this->designs, new ErrorMessage('There is already a design with this name.'));
+			}
+		}
+		$this->assertNotEmpty($this->title, new ErrorMessage('Please type in a title.'));
+	}
+}
+
+class AdminDesignsSettingsAction extends AdminBaseFormAction {
+
+	private $design;
+	
+	protected function load() {
+		try {
+			$this->design = $this->getModel()->getDesigns($this->getRequest()->getPart(2));
+		} catch(DesignNotFoundException $e) {
+			$this->forward('/admin/designs', new ErrorMessage('Design does not exist!'));
+		}
+		$this->getDesign()->assign('design', $this->design);
+	}	
+
+	public function getTemplate() {
+		return 'Admin/designSettings.tpl';
+	}
+
+	protected function getReturn() {
+		return 'files';
+	}
+
+	protected function createForm() {
+		return new AdminDesignsSettingsForm($this->design->getName(), array());
+	}
+	
+	/**
+	 * @override
+	 */
+	protected function getBase() {
+		return '/admin/designs/' . $this->design->getName();
+	}
+
+	protected function loadForm(Form $form) {
+		$form->title = $this->design->getTitle();
+		$form->name = $this->design->getName();
+		$form->author = $this->design->getAuthor();
+		$form->license = $this->design->getLicense();
+	}
+
+	public function succeed(Form $form) {
+		// TODO save design settings
+		return new Message('Changes saved!');
 	}
 }
 

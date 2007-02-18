@@ -1,4 +1,4 @@
-{layout template="Admin/layout.tpl" middleTitle="Edit page" title=$model.title}
+{layout template="Admin/designLayout.tpl" title="Edit file"}
   
   {form}
    <fieldset>

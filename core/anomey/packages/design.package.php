@@ -35,8 +35,10 @@ class Design extends Smarty implements ArrayAccess {
 	private $title;
 	
 	private $author;
+	
+	private $license;
 
-	public function __construct($profile, $name, $title, $author) {
+	public function __construct($profile, $name, $title, $author, $license) {
 		parent::__construct();
 		
 		if (!file_exists($profile . '/tmp/templates')) {
@@ -58,6 +60,7 @@ class Design extends Smarty implements ArrayAccess {
 		$this->name = $name;
 		$this->title = $title;
 		$this->author = $author;
+		$this->license = $license;
 
 		$path = array ();
 
@@ -94,6 +97,10 @@ class Design extends Smarty implements ArrayAccess {
 	
 	public function getAuthor() {
 		return $this->author;
+	}
+	
+	public function getLicense() {
+		return $this->license;
 	}
 	
 	public function parseText($string) {

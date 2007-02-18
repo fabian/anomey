@@ -68,6 +68,15 @@ abstract class Form extends Bean {
 		}
 	}
 
+	protected function assertNotEqual($value, $value2, Message $error) {
+		if ($value == $value2) {
+			$this->addError($error);
+			return false;
+		} else {
+			return true;
+		}
+	}
+
 	protected function assertTrue($condition, Message $error) {
 		if (!$condition) {
 			$this->addError($error);

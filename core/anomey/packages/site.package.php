@@ -484,14 +484,15 @@ class Site extends Model {
 				$designXml = XML :: load($path . '/' . $name . '/design.xml');
 				$title = (string) $designXml->title;
 				$author = (string) $designXml->author->name;
-				$this->designs[$name] = new Design($this->store->getProfile(), $name, $title, $author);
+				$license = (string) $designXml->license;
+				$this->designs[$name] = new Design($this->store->getProfile(), $name, $title, $author, $license);
 			}
 		}
 
 		$this->loadModules();
 		
 		// set default design
-		$this->setDesign(new Design($this->store->getProfile(), '', 'Default', 'anomey team'));
+		$this->setDesign(new Design($this->store->getProfile(), '', 'Default', 'anomey team', 'GPL'));
 		
 		try {
 			$xml = Xml :: load($this->sitemap);

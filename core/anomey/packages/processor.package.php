@@ -411,7 +411,7 @@ class Processor extends LinkContainer {
 	 * into a absolute.
 	 */
 	public static function resolveTrail($base, $trail) {
-		if (substr($trail, 0, 1) != '/') {
+		if(self::isRelativeTrail($trail)) {
 			$newTrail = $base;
 
 			if ($trail != '' and $newTrail != '/') {
@@ -422,6 +422,10 @@ class Processor extends LinkContainer {
 		}
 
 		return $trail;
+	}
+	
+	public static function isRelativeTrail($trail) {
+		return substr($trail, 0, 1) != '/';
 	}
 }
 

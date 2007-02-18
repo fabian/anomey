@@ -117,7 +117,9 @@ abstract class Action implements WebAction {
 			$this->getRequest()->addMessage($message);
 		}
 		
-		$trail = Processor::resolveTrail($this->getBase(), $trail);
+		if(Processor::isRelativeTrail($trail)) {
+			$trail = Processor::resolveTrail($this->getBase(), $trail);
+		}
 		
 		$this->getProcessor()->forward($this->getRequest(), $trail, $this->getRequest()->getMessages());
 	}
