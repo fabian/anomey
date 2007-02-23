@@ -79,7 +79,7 @@ class TextAction extends Action implements ProtectedAction {
 	public function execute() {
 		$content = $this->getModel()->getContent();
 		$this->getDesign()->assign('content', $content);
-		$this->getDesign()->display('Text/content.tpl');
+		$this->getResponse()->setBody($this->getDesign()->fetch('Text/content.tpl'));
 	}
 }
 

@@ -20,3 +20,4 @@ anomey 2.1.0
 - added WebAction::getContentType()
 - added Processor::isRelativeTrail()
 - added Form::assertNotEqual()
+- added class Response

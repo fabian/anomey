@@ -213,7 +213,7 @@ class Processor extends LinkContainer {
 		$xml->save($this->configuration);
 	}
 
-	public function execute(Request $request) {
+	public function execute(Request $request, Response $response) {
 		header('X-Powered-By: anomey/' . Anomey :: VERSION);
 
 		if ($request->getTrail() == '/') {
@@ -225,10 +225,10 @@ class Processor extends LinkContainer {
 		}
 
 		try {
-			$this->executeAction($request, $request->getTrail());
+			$this->executeAction($request, $response, $request->getTrail());
 		} catch (ActionNotFoundException $eee) {
 			try {
-				$this->executeAction($request, $this->getPageNotFoundTrail());
+				$this->executeAction($request, $response, $this->getPageNotFoundTrail());
 			} catch (ActionNotFoundException $ee) {
 				exit ('Could not find the error action, defined in "' . $this->configuration . '"!');
 			} catch (AccessDeniedException $ee) {
@@ -236,10 +236,10 @@ class Processor extends LinkContainer {
 			}
 		} catch (AccessDeniedException $e) {
 			if ($request->getUser() == null) {
-				$this->executeAction($request, '/login');
+				$this->executeAction($request, $response, '/login');
 			} else {
 				try {
-					$this->executeAction($request, $this->getAccessDeniedTrail());
+					$this->executeAction($request, $response, $this->getAccessDeniedTrail());
 				} catch (ActionNotFoundException $ee) {
 					exit ('Could not find the access-denied trail, defined in "' . $this->configuration . '"!');
 				} catch (AccessDeniedException $ee) {
@@ -247,22 +247,26 @@ class Processor extends LinkContainer {
 				}
 			}
 		} catch (TrustedUserRequiredException $e) {
-			$this->executeAction($request, '/trusted');
+			$this->executeAction($request, $response, '/trusted');
+		}
+
+		foreach ($this->security->getExtensions() as $extension) {
+			$extension->finish($response);
 		}
 	}
 
-	private function executeAction($request, $trail) {
-		$this->callAction($this, $request, $trail, $this->security);
+	private function executeAction(Request $request, Response $response, $trail) {
+		$this->callAction($this, $request, $response, $trail, $this->security);
 	}
 	
-	public function callAction(LinkContainer $container, $request, $trail, $security) {
+	public function callAction(LinkContainer $container, Request $request, Response $response, $trail, $security) {
 		try {
 			$link = $this->findLink($container, $trail);
 		} catch (LinkNotFoundException $e) {
 			throw new ActionNotFoundException($e->getMessage());
 		}
 		
-		$link->execute($this, $request, $security);
+		$link->execute($this, $request, $response, $security);
 	}
 
 	public function refresh($request) {
@@ -471,7 +475,7 @@ abstract class Link extends LinkContainer {
 		$this->hide = $hide;
 	}
 
-	abstract public function execute(Processor $processor, Request $request, Security $security);
+	abstract public function execute(Processor $processor, Request $request, Response $response, Security $security);
 
 	abstract public function isExecutable($user);
 }
@@ -524,7 +528,7 @@ class SecureLink extends Link {
 		$this->action = $action;
 	}
 
-	public function execute(Processor $processor, Request $request, Security $security) {
+	public function execute(Processor $processor, Request $request, Response $response, Security $security) {
 		$nick = $request->getUser() == null ? '' : $request->getUser()->getNick();
 		if (!$this->isExecutable($request->getUser())) {
 			throw new AccessDeniedException('User ' . $nick . ' can\'t access this page!');
@@ -540,7 +544,7 @@ class SecureLink extends Link {
 		// load model data
 		$this->getModel()->load();
 		
-		$action = new $this->action($processor, $request, $this->getModel(), $security);
+		$action = new $this->action($processor, $request, $response, $this->getModel(), $security);
 		header('Content-type: ' . $action->getContentType());
 		$action->execute();
 	}
@@ -570,8 +574,8 @@ class SiteLink extends Link {
 		$this->action = $action;
 	}
 
-	public function execute(Processor $processor, Request $request, Security $security) {
-		$action = new $this->action($processor, $request, $this->site, $security);
+	public function execute(Processor $processor, Request $request, Response $response, Security $security) {
+		$action = new $this->action($processor, $request, $response, $this->site, $security);
 		header('Content-type: ' . $action->getContentType());
 		$action->execute();
 	}
@@ -685,40 +689,27 @@ class Request extends Bean {
 	}
 }
 
-class Extension {
-
-	private $site;
-
-	public function getSite() {
-		return $this->site;
+class Response extends Bean {
+	
+	private $contentType = 'text/html';
+	
+	private $body = '';
+	
+	public function getContentType() {
+		return $this->contentType;
 	}
 	
-	public function setSite(Site $site) {
-		$this->site = $site;
-	}
-
-	private $processor;
-
-	public function getProcessor() {
-		return $this->processor;
+	public function setContentType($contentType) {
+		$this->contentType = $contentType;
 	}
 	
-	public function setProcessor(Processor $processor) {
-		$this->processor = $processor;
+	public function getBody() {
+		return $this->body;
 	}
-
-	/**
-	 * To be overloaded.
-	 */
-	public function load() {
-
-	}
-
-	/**
-	 * To be overloaded.
-	 */
-	public function invoke(Request $request) {
-
+	
+	public function setBody($body) {
+		$this->body = $body;
 	}
 }
+
 ?>

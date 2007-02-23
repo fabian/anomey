@@ -27,7 +27,7 @@
  */
 
 interface WebAction {
-	public function __construct(Processor $processor, Request $request, Model $model, Security $security);
+	public function __construct(Processor $processor, Request $request, Response $response, Model $model, Security $security);
 	public function getContentType();
 	public function execute();
 }
@@ -85,10 +85,17 @@ abstract class Action implements WebAction {
 	public function getContentType() {
 		return 'text/html';
 	}
+	
+	private $respone;
+	
+	public function getResponse() {
+		return $this->response;
+	}
 
-	public function __construct(Processor $processor, Request $request, Model $model, Security $security) {
+	public function __construct(Processor $processor, Request $request, Response $response, Model $model, Security $security) {
 		$this->processor = $processor;
 		$this->request = $request;
+		$this->response = $response;
 		$this->model = $model;
 		$this->security = $security;
 		

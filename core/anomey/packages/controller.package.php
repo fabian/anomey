@@ -218,13 +218,17 @@ class Controller {
 	
 			$request = new Request($user, $method, $trail, $session, $cookie, $parameters, $messages);
 	
+			// Initialize response.
+			$response = new Response();
+			
 			// -----------------------------
 			// Call the processor. 
 			// -----------------------------
 	
 			$processor = new Processor($url, $profile . '/xml/config.xml', $security, $site);
-			$processor->execute($request);
+			$processor->execute($request, $response);
 			
+			echo $response->getBody();
 		} catch (Exception $e) {
 			$code = ob_get_clean();
 			include 'error.view.php';
