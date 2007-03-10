@@ -263,7 +263,7 @@ class AdminPageEditAction extends AdminBaseAction {
 			
 			$container->add('.*', $adminLink);
 			$trail = substr($this->getRequest()->getTrail(), strlen('/admin/pages'));
-			$this->getProcessor()->callAction($container, $this->getRequest(), $trail, $this->getSecurity());
+			$this->getProcessor()->callAction($container, $this->getRequest(), $this->getResponse(), $trail, $this->getSecurity());
 		} catch (PageNotFoundException $e) {
 			$this->forward('/admin/pages', new ErrorMessage('Page does not exist!'));
 		}

@@ -28,12 +28,20 @@ body {
 }
 
 h1, h2 {
- font-family: "Trebuchet MS", sans-serif;
+ font-family: Georgia, Times, serif;
  color: #204A87;
+}
+
+h1 {
+ font-size: 3em;
 }
 
 h2, h3 {
  color: #3465A4;
+}
+
+h2 {
+ font-size: 2em;
 }
 
 table {
