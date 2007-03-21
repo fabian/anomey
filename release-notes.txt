@@ -21,3 +21,4 @@ anomey 2.1.0
 - added Processor::isRelativeTrail()
 - added Form::assertNotEqual()
 - added class Response
+- added Action::display() for easy displaying a template.
