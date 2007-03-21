@@ -125,7 +125,7 @@ class GuestbookAction extends Action implements ActionContainer, ProtectedAction
 
 	public function execute() {
 		$this->getDesign()->assign('entries', $this->getModel()->getEntries());
-		$this->getDesign()->display('Guestbook/entries.tpl');
+		$this->display('Guestbook/entries.tpl');
 	}
 }
 ?>

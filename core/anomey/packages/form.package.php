@@ -187,7 +187,7 @@ abstract class FormAction extends Action {
 		}
 
 		$this->getDesign()->assign('form', $this->getForm());
-		$this->getDesign()->display($this->getTemplate());
+		parent::display($this->getTemplate());
 	}
 
 	public final function execute() {

@@ -40,15 +40,13 @@ class Sitemaps extends Module {
 }
 
 class SitemapsAction extends Action {
-
-	public function getContentType() {
-		return 'application/xml';
-	}
 	
 	public function execute() {
+		$this->getResponse()->setContentType('application/xml');
+		
 		$pages = $this->getModel()->getPages();
 		$this->getDesign()->assign('pages', $pages);
-		$this->getDesign()->display('Sitemaps/sitemap.tpl');
+		$this->display('Sitemaps/sitemap.tpl');
 	}
 }
 

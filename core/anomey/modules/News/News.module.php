@@ -7,19 +7,19 @@ class EntryNotFoundException extends Exception {
 class News extends Module {
 
 	private $nextId = 1;
-	
+
 	public function getAuthor() {
 		return 'anomey team';
 	}
 
 	public function getAvailablePermissions() {
 		return array (
-			'read' => 'read entries',
-			'edit' => 'add or change an entry',
-			'delete' => 'delete entries'
+		'read' => 'read entries',
+		'edit' => 'add or change an entry',
+		'delete' => 'delete entries'
 		);
 	}
-	
+
 	public function init() {
 		$this->entries = new Collection();
 	}
@@ -47,7 +47,7 @@ class News extends Module {
 		}
 		return $publications;
 	}
-	
+
 	public function getEntry($id) {
 		if($this->entries->exists($id)) {
 			return $this->entries->get($id);
@@ -55,13 +55,13 @@ class News extends Module {
 			throw new EntryNotFoundException();
 		}
 	}
-	
+
 	public function getLastModified() {
 		return $this->getPublications()->first()->first()->getPublication();
 	}
-	
+
 	private $preface = '';
-	
+
 	public function setPreface($preface) {
 		$this->preface = $preface;
 	}
@@ -74,7 +74,7 @@ class News extends Module {
 		$xml = $this->getXml();
 		$this->nextId = (int) $xml['nextid'];
 		$this->preface = (string) $xml->preface;
-		
+
 		foreach ($xml->entry as $entry) {
 			try {
 				$author = $this->getSecurity()->getUser((string) $entry->author);
@@ -104,10 +104,10 @@ class News extends Module {
 		$xml = XML :: create('news');
 		$xml->addAttribute('nextid', $this->nextId);
 		$xml->addChild('preface', $this->getPreface());
-		
+
 		$this->setModified(date('Y-m-d', $this->getLastModified()));
 		$this->getSite()->save();
-		
+
 		foreach ($this->getAllPublications() as $publication) {
 			foreach ($publication as $entry) {
 				$child = $xml->addChild('entry');
@@ -141,7 +141,7 @@ class NewsAddEntryAction extends FormAction implements ProtectedAction {
 
 	public static function getRequiredPermissions() {
 		return array (
-			'add'
+		'add'
 		);
 	}
 
@@ -174,7 +174,7 @@ class NewsEntry extends Bean {
 	private $publication = '';
 	private $created = '';
 	private $author = null;
-	
+
 	public function getId() {
 		return $this->id;
 	}
@@ -182,7 +182,7 @@ class NewsEntry extends Bean {
 	public function getTitle() {
 		return $this->title;
 	}
-	
+
 	public function getName() {
 		return $this->name;
 	}
@@ -194,11 +194,11 @@ class NewsEntry extends Bean {
 	public function getPublication() {
 		return $this->publication;
 	}
-	
+
 	public function getCreated() {
 		return $this->created;
 	}
-	
+
 	public function getAuthor() {
 		return $this->author;
 	}
@@ -215,21 +215,21 @@ class NewsEntry extends Bean {
 }
 
 class NewsAction extends Action implements ProtectedAction, ActionContainer {
-	
+
 	public static function getActions() {
 		return array(
-			'feed' => 'NewsFeedAction'
+		'feed' => 'NewsFeedAction'
 		);
 	}
 
 	public static function getRequiredPermissions() {
 		return array (
-			'read'
+		'read'
 		);
 	}
 
 	public function execute() {
-		$this->getDesign()->display('News/entries.tpl');
+		$this->display('News/entries.tpl');
 	}
 }
 
@@ -237,16 +237,13 @@ class NewsFeedAction extends Action implements ProtectedAction {
 
 	public static function getRequiredPermissions() {
 		return array (
-			'read'
+		'read'
 		);
 	}
 
-	public function getContentType() {
-		return 'application/xml';
-	}
-
 	public function execute() {
-		$this->getDesign()->display('News/atom.tpl');
+		$this->getResponse()->setContentType('application/xml');
+		$this->display('News/atom.tpl');
 	}
 }
 
@@ -254,8 +251,8 @@ class NewsAdminAction extends AbstractAdminAction implements ActionContainer {
 
 	public static function getActions() {
 		return array (
-			'entries' => 'NewsAdminEntriesAction',
-			'settings' => 'NewsAdminSettingsAction'
+		'entries' => 'NewsAdminEntriesAction',
+		'settings' => 'NewsAdminSettingsAction'
 		);
 	}
 
@@ -274,26 +271,26 @@ class NewsAdminForm extends Form {
 }
 
 class NewsAdminEntriesAction extends AbstractAdminFormAction implements ActionContainer {
-	
+
 	public static function getActions() {
 		return array (
-			'edit' => 'NewsAdminEditEntryAction',
-			'add' => 'NewsAdminAddEntryAction'
+		'edit' => 'NewsAdminEditEntryAction',
+		'add' => 'NewsAdminAddEntryAction'
 		);
 	}
-	
+
 	public function getTemplate() {
 		return 'Admin/News/entries.tpl';
 	}
-	
+
 	public function load() {
 		$this->getDesign()->assign('publications', $this->getModel()->getAllPublications());
 	}
-	
+
 	public function createForm() {
 		return new NewsAdminForm();
 	}
-	
+
 	public function succeed(Form $form) {
 		foreach($form->toDelete as $id) {
 			try {
@@ -303,20 +300,20 @@ class NewsAdminEntriesAction extends AbstractAdminFormAction implements ActionCo
 			}
 		}
 		$this->getModel()->save();
-		
+
 		return new Message('Selected entries(s) deleted.');
 	}
 }
 
 class NewsAdminEntryForm extends Form {
-	
+
 	public $title = '';
 	public $publicationDate = '';
 	public $publicationTime = '';
 	public $contentOfEntry = '';
-	
+
 	protected function validate() {
-		
+
 	}
 }
 
@@ -325,31 +322,31 @@ class NewsAdminEditEntryAction extends AbstractAdminFormAction {
 	public function getTemplate() {
 		return 'Admin/News/edit.tpl';
 	}
-	
+
 	protected function getReturn() {
 		return 'entries';
 	}
-	
+
 	private $entry;
 
 	public function load() {
 		$this->entry = $this->getModel()->getEntry($this->getRequest()->getParameter(6));
 	}
-	
+
 	protected function createForm() {
 		return new NewsAdminEntryForm();
 	}
-	
+
 	protected function loadForm(Form $form) {
 		$form->title = $this->entry->getTitle();
 		$form->publicationDate = $this->entry->getPublication();
 		$form->publicationTime = $this->entry->getPublication();
 		$form->contentOfEntry = $this->entry->getContent();
 	}
-	
+
 	public function succeed(Form $form) {
 		$publication = $form->publicationDate['Year'] . '-' . $form->publicationDate['Month'] . '-' . $form->publicationDate['Day'] . 'T' . $form->publicationTime['Hour'] . ':' . $form->publicationTime['Minute'] . ':00';
-		
+
 		$entry = new NewsEntry($this->entry->getId(), $form->title, $form->contentOfEntry, $publication, $this->getRequest()->getUser());
 		$this->getModel()->update($entry);
 		$this->getModel()->save();
@@ -363,18 +360,18 @@ class NewsAdminAddEntryAction extends AbstractAdminFormAction {
 	public function getTemplate() {
 		return 'Admin/News/add.tpl';
 	}
-	
+
 	protected function getReturn() {
 		return 'entries';
 	}
-	
+
 	protected function createForm() {
 		return new NewsAdminEntryForm();
 	}
-	
+
 	public function succeed(Form $form) {
 		$publication = $form->publicationDate['Year'] . '-' . $form->publicationDate['Month'] . '-' . $form->publicationDate['Day'] . 'T' . $form->publicationTime['Hour'] . ':' . $form->publicationTime['Minute'] . ':00';
-		
+
 		$this->getModel()->add($form->title, $form->contentOfEntry, $publication, $this->getRequest()->getUser());
 		$this->getModel()->save();
 
@@ -390,14 +387,14 @@ class NewsAdminSettingsAction extends AbstractDefaultAdminFormAction {
 
 	public static function getRequiredPermissions() {
 		return array(
-			'edit'
+		'edit'
 		);
 	}
 
 	public function getTemplate() {
 		return 'Admin/News/settings.tpl';
 	}
-	
+
 	protected function getReturn() {
 		return 'settings';
 	}
@@ -413,7 +410,7 @@ class NewsAdminSettingsAction extends AbstractDefaultAdminFormAction {
 	public function save(Form $form) {
 		$this->getModel()->setPreface($form->preface);
 		$this->getModel()->save();
-		
+
 		return new Message('Settings saved!');
 	}
 }

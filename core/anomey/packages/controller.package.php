@@ -227,7 +227,12 @@ class Controller {
 	
 			$processor = new Processor($url, $profile . '/xml/config.xml', $security, $site);
 			$processor->execute($request, $response);
-			
+				
+			// -----------------------------
+			// Write out the response.
+			// -----------------------------
+
+			header('Content-type: ' . $response->getContentType());
 			echo $response->getBody();
 		} catch (Exception $e) {
 			$code = ob_get_clean();

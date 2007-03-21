@@ -30,30 +30,59 @@ class AdminSecurityAction extends AdminBaseAction implements ActionContainer {
 
 	public static function getActions() {
 		return array (
-			'users' => 'AdminSecurityUsersAction',
-			'groups' => 'AdminSecurityGroupsAction',
-			'permissions' => 'AdminSecurityPermissionsAction'
+		'users' => 'AdminSecurityUsersAction',
+		'groups' => 'AdminSecurityGroupsAction',
+		'permissions' => 'AdminSecurityPermissionsAction'
 		);
 	}
-	
+
 	public function execute() {
 		$this->forward('/admin/security/permissions');
 	}
 }
 
-class AdminSecurityUsersAction extends AdminBaseAction implements ActionContainer {
+class AdminSecurityUsersForm extends Form {
+
+	public $toDelete = array();
+
+	public function validate() {
+		$this->assertTrue(count($this->toDelete) > 0, new ErrorMessage('Please select at least one user to delete.'));
+	}
+}
+
+class AdminSecurityUsersAction extends AdminBaseFormAction implements ActionContainer {
 
 	public static function getActions() {
 		return array (
-			'edit' => 'AdminSecurityEditUserAction',
-			'delete' => 'AdminSecurityDeleteUserAction',
-			'add' => 'AdminSecurityAddUserAction'
+		'edit' => 'AdminSecurityEditUserAction',
+		'add' => 'AdminSecurityAddUserAction'
 		);
 	}
-	
-	public function execute() {
+
+	public function getTemplate() {
+		return 'Admin/users.tpl';
+	}
+
+	public function load() {
 		$this->getDesign()->assign('users', $this->getSecurity()->getUsers());
-		$this->getDesign()->display('Admin/users.tpl');
+	}
+
+	public function createForm() {
+		return new AdminSecurityUsersForm();
+	}
+
+	public function succeed(Form $form) {
+		foreach($form->toDelete as $id) {
+			try {
+				$user = $this->getSecurity()->getUser($id);
+				$this->getSecurity()->removeUser($user->getId());
+				$this->getSecurity()->saveUsers();
+			} catch(UserNotFoundException $e) {
+				// ignore
+			}
+		}
+
+		return new Message('Selected user(s) deleted!');
 	}
 }
 
@@ -144,16 +173,6 @@ class AdminSecurityEditUserAction extends AdminBaseFormAction {
 	}
 }
 
-class AdminSecurityDeleteUserAction extends AdminBaseAction {
-	public function execute() {
-		$user = $this->getSecurity()->getUser($this->getRequest()->getParameter('user'));
-		$this->getSecurity()->removeUser($user->getId());
-		$this->getSecurity()->saveUsers();
-
-		$this->forward('/admin/security/users', new Message('User has been deleted!'));
-	}
-}
-
 class AdminSecurityAddUserForm extends AdminSecurityUserForm {
 
 	public function validate() {
@@ -197,19 +216,48 @@ class AdminSecurityAddUserAction extends AdminBaseFormAction {
 	}
 }
 
-class AdminSecurityGroupsAction extends AdminBaseAction implements ActionContainer {
+class AdminSecurityGroupsForm extends Form {
+
+	public $toDelete = array();
+
+	public function validate() {
+		$this->assertTrue(count($this->toDelete) > 0, new ErrorMessage('Please select at least one group to delete.'));
+	}
+}
+
+class AdminSecurityGroupsAction extends AdminBaseFormAction implements ActionContainer {
 
 	public static function getActions() {
 		return array (
-			'edit' => 'AdminSecurityEditGroupAction',
-			'delete' => 'AdminSecurityDeleteGroupAction',
-			'add' => 'AdminSecurityAddGroupAction'
+		'edit' => 'AdminSecurityEditGroupAction',
+		'add' => 'AdminSecurityAddGroupAction'
 		);
 	}
-	
-	public function execute() {
-		$this->getDesign()->assign('groups', $this->getSecurity()->getGroups());
-		$this->getDesign()->display('Admin/groups.tpl');
+
+	public function getTemplate() {
+		return 'Admin/groups.tpl';
+	}
+
+	public function load() {
+		$this->getDesign()->assign('groups', $this->getSecurity()->getGroups());;
+	}
+
+	public function createForm() {
+		return new AdminSecurityGroupsForm();
+	}
+
+	public function succeed(Form $form) {
+		foreach($form->toDelete as $id) {
+			try {
+				$group = $this->getSecurity()->getGroup($id);
+				$this->getSecurity()->removeGroup($group->getId());
+				$this->getSecurity()->saveGroups();
+			} catch(GroupNotFoundException $e) {
+				// ignore
+			}
+		}
+
+		return new Message('Selected group(s) deleted!');
 	}
 }
 
@@ -334,50 +382,40 @@ class AdminSecurityAddGroupAction extends AdminBaseFormAction {
 	}
 }
 
-class AdminSecurityDeleteGroupAction extends AdminBaseAction {
-	public function execute() {
-		$group = $this->getSecurity()->getGroup($this->getRequest()->getParameter('group'));
-		$this->getSecurity()->removeGroup($group->getId());
-		$this->getSecurity()->saveGroups();
-
-		$this->forward('/admin/security/groups', new Message('Group has been deleted!'));
-	}
-}
-
 class AdminSecurityPermissionsAction extends AdminBaseAction implements ActionContainer {
-	
+
 	public static function getActions() {
 		return array(
-			'change' => 'AdminSecurityPermissionsChangeAction'
+		'change' => 'AdminSecurityPermissionsChangeAction'
 		);
 	}
-	
+
 	public function execute() {
 		$this->getDesign()->assign('pages', $this->getModel()->getChilds());
-		$this->getDesign()->display('Admin/permissions.tpl');
+		$this->display('Admin/permissions.tpl');
 	}
 }
 
 class AdminSecurityPermissionsChangeForm extends Form {
 
 	public $who = array();
-	
+
 	public $users = array ();
 	private $allUsers = array ();
 
 	public function getAllUsers() {
 		return $this->allUsers;
 	}
-	
+
 	public $groups = array();
 	private $allGroups = array();
 
 	public function getAllGroups() {
 		return $this->allGroups;
 	}
-	
+
 	private $permissions = array();
-	
+
 	public function getPermissions() {
 		return $this->permissions;
 	}
@@ -387,7 +425,7 @@ class AdminSecurityPermissionsChangeForm extends Form {
 		$this->allGroups = $allGroups;
 		$this->permissions = $permissions;
 	}
-	
+
 	public function validate() {
 	}
 }
@@ -413,12 +451,12 @@ class AdminSecurityPermissionsChangeAction extends AdminBaseFormAction {
 		foreach ($this->getSecurity()->getUsers() as $user) {
 			$allUsers[$user->getId()] = $user->getNick();
 		}
-		
+
 		$allGroups = array ();
 		foreach ($this->getSecurity()->getGroups() as $group) {
 			$allGroups[$group->getId()] = $group->getName();
 		}
-		
+
 		$permissions = array();
 		foreach ($this->page->getPermissions() as $permission) {
 			$permissions[] = $permission->getName();
@@ -428,26 +466,26 @@ class AdminSecurityPermissionsChangeAction extends AdminBaseFormAction {
 
 		return $form;
 	}
-	
+
 	private function loadUsers() {
-		
+
 	}
 
 	protected function loadForm(Form $form) {
 		$users = array ();
 		$groups = array ();
-		
+
 		foreach($this->page->getPermissions() as $permission) {
 			if($permission->getEveryone()) {
 				$form->who[$permission->getName()] = 'everyone';
 			} else {
 				$form->who[$permission->getName()] = 'users';
 			}
-			
+
 			foreach($permission->getUsers() as $user) {
 				$users[$permission->getName()][] = $user->getId();
 			}
-			
+
 			foreach($permission->getGroups() as $group) {
 				$groups[$permission->getName()][] = $group->getId();
 			}
@@ -457,26 +495,26 @@ class AdminSecurityPermissionsChangeAction extends AdminBaseFormAction {
 		$form->groups = $groups;
 	}
 
-	
+
 	protected function succeed(Form $form) {
 		foreach($this->page->getPermissions() as $permission) {
 			$permission->clear();
-			
+
 			foreach(Value::get($form->users[$permission->getName()], array()) as $id) {
 				$permission->addUser($this->getSecurity()->getUser($id));
 			}
-			
+
 			foreach(Value::get($form->groups[$permission->getName()], array()) as $id) {
 				$permission->addGroup($this->getSecurity()->getGroup($id));
 			}
-			
+
 			if(Value::get($form->who[$permission->getName()], 'everyone') == 'everyone') {
 				$permission->setEveryone(true);
 			} else {
 				$permission->setEveryone(false);
 			}
 		}
-		
+
 		$this->getSecurity()->save();
 	}
 }

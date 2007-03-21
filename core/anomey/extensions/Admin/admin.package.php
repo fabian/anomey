@@ -70,7 +70,7 @@ class AdminOverviewAction extends AdminBaseAction {
 	public function execute() {
 		$this->getDesign()->assign('php', phpversion());
 		$this->getDesign()->assign('server', $_SERVER['SERVER_SOFTWARE']);
-		$this->getDesign()->display('Admin/overview.tpl');
+		$this->display('Admin/overview.tpl');
 	}
 }
 

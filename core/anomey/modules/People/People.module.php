@@ -100,9 +100,9 @@ class PeopleAction extends Action implements ProtectedAction {
 
 	public function execute() {
 		if($this->getModel()->getDisplay() == People::DISPLAY_DETAIL) {
-			$this->getDesign()->display('People/detail.tpl');
+			$this->display('People/detail.tpl');
 		} else {
-			$this->getDesign()->display('People/list.tpl');
+			$this->display('People/list.tpl');
 		}
 	}
 }

@@ -545,7 +545,6 @@ class SecureLink extends Link {
 		$this->getModel()->load();
 		
 		$action = new $this->action($processor, $request, $response, $this->getModel(), $security);
-		header('Content-type: ' . $action->getContentType());
 		$action->execute();
 	}
 

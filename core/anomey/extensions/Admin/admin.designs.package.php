@@ -36,7 +36,7 @@ class AdminDesignsAction extends AdminBaseAction implements ActionContainer {
 
 	public function execute() {
 		$this->getDesign()->assign('designs', $this->getModel()->getDesigns());
-		$this->getDesign()->display('Admin/designs.tpl');
+		$this->display('Admin/designs.tpl');
 	}
 }
 
@@ -111,7 +111,7 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 
 		$this->getDesign()->assign('design', $this->design);
 		$this->getDesign()->assign('files', $files);
-		$this->getDesign()->display('Admin/design.tpl');
+		$this->display('Admin/design.tpl');
 	}
 }
 

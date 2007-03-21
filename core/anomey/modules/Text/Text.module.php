@@ -155,7 +155,7 @@ class TextAdminMediaAction extends AbstractAdminAction implements ActionContaine
 
 	public function execute() {
 		$this->getDesign()->assign('files', FileSytem::get($this->getModel()->getMediaPath()));
-		$this->getDesign()->display('Admin/Text/media.tpl');
+		$this->display('Admin/Text/media.tpl');
 	}
 }
 

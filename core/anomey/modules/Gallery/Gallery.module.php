@@ -517,7 +517,7 @@ class GalleryAction extends Action implements ActionContainer, ProtectedAction {
 		$this->getDesign()->assign('settings', $this->getModel()->getSettings());
 		$this->getDesign()->assign('gallery', $this->getModel()->getItem());
 
-		$this->getDesign()->display('Gallery/gallery.tpl');
+		$this->display('Gallery/gallery.tpl');
 	}
 }
 
@@ -644,7 +644,7 @@ class GalleryAdminContentAction extends AbstractAdminAction {
 		$this->getModel()->getRoot()->listGalleries(&$galleries, 0);
 		
 		$this->getDesign()->assign('galleries', $galleries);
-		$this->getDesign()->display('Admin/Gallery/content.tpl');
+		$this->display('Admin/Gallery/content.tpl');
 	}
 }
 
@@ -659,7 +659,7 @@ class GalleryAdminStateAction extends AbstractAdminAction {
 	public function execute() {
 		$this->getDesign()->assign('state', $this->getModel()->getState());
 		
-		$this->getDesign()->display('Admin/Gallery/state.tpl');
+		$this->display('Admin/Gallery/state.tpl');
 	}
 }
 
@@ -834,7 +834,7 @@ class GalleryAdminEditGalleryAction extends AbstractAdminAction {
 		
 		$this->getDesign()->assign('item', $this->getModel()->getItem());
 		
-		$this->getDesign()->display('Admin/Gallery/editgallery.tpl');
+		$this->display('Admin/Gallery/editgallery.tpl');
 		
 	}
 }
