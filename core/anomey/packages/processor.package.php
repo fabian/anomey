@@ -575,7 +575,6 @@ class SiteLink extends Link {
 
 	public function execute(Processor $processor, Request $request, Response $response, Security $security) {
 		$action = new $this->action($processor, $request, $response, $this->site, $security);
-		header('Content-type: ' . $action->getContentType());
 		$action->execute();
 	}
 
