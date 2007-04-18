@@ -8,11 +8,13 @@
 {/capture}
 
 {capture assign="actions"}
- {link trail="admin/designs/add"}<ul id="actions">
-  <li><a href="{$href}" class="action add_file">Create file</a></li>
-  <li><a href="{$href}" class="action copy">Copy file</a></li>
-  <li><a href="{$href}" class="action upload">Upload file</a></li>
- </ul>{/link}
+ <ul id="actions">
+	{link trail="files/add"}<li><a href="{$href}" class="action add_file">Create file</a></li>
+	{/link} {link trail="files/copy"}
+	<li><a href="{$href}" class="action copy">Copy file</a></li>
+	{/link}
+	<!-- <li><a href="{$href}" class="action upload">Upload file</a></li> -->
+</ul>
 {/capture}
 
 {form}
@@ -34,7 +36,8 @@
  <tbody>
  {foreach from=$files item=file}
  <tr{cycle values=", class=\"even\""}>
-  <td><input id="page{$page.id}" name="toDelete[]" type="checkbox" value="{$page.id}" /></td>
+  <td><input id="page{$page.id}" name="toDelete[]" type="checkbox"
+				value="{$file.encoded}" /></td>
   <td>{$file.path}</td>
   <td>{$file.modified|date_format:"%Y-%m-%d %H:%M"}</td>
   <td>{link trail="files/`$file.encoded`"}<a href="{$href}" class="action edit">edit</a>{/link}</td>

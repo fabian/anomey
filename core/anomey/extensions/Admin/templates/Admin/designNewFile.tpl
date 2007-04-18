@@ -1,11 +1,12 @@
-{layout template="Admin/designLayout.tpl" title="Edit file"}
+{layout template="Admin/designLayout.tpl" title="Create new file"}
 
   {form}
    <fieldset>
     <legend><span>General</span></legend>
                      
     <div class="text last">
-     <label for="file" title="Filename of the file">Filename <span class="required" title="Required">*</span></label><br />
+     <label for="file" title="Filename of the new file.">Filename <span
+	class="required" title="Required">*</span></label><br />
      <input type="text" name="file" id="file" value="{$form.file}" title="Name of the file." />
     </div>
    </fieldset>
@@ -21,7 +22,7 @@
    <div>
     <input type="hidden" name="confirmed" id="confirmed" value="{$form.confirmed}" />
     
-    {submit  value="Save changes"}
+    {submit  value="Create file"}
     {cancel}
    </div>
   {/form}

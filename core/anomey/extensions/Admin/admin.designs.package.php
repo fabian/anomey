@@ -64,12 +64,26 @@ class AdminDesignsDesignAction extends AdminBaseAction implements ActionContaine
 	}
 }
 
-class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer {
+class AdminDesignsFilesForm extends Form {
+
+	public $toDelete = array();
+
+	public function validate() {
+		$this->assertTrue(count($this->toDelete) > 0, new ErrorMessage('Please select at least one file to delete.'));
+	}
+}
+
+class AdminDesignsFilesAction extends AdminBaseFormAction implements ActionContainer {
 
 	public static function getActions() {
 		return array(
+			'add' => 'AdminDesignsCreateFileAction',
 			URI::CHARS . '*' => 'AdminDesignsFileAction'
 		);
+	}
+
+	public function getTemplate() {
+		return 'Admin/design.tpl';
 	}
 
 	private $design;
@@ -77,6 +91,12 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 	protected function load() {
 		try {
 			$this->design = $this->getModel()->getDesigns($this->getRequest()->getPart(2));
+			
+			$path = $this->getSecurity()->getProfile() . '/designs/' . $this->design->getName() . '/templates';
+			$files = $this->scan($path);
+
+			$this->getDesign()->assign('design', $this->design);
+			$this->getDesign()->assign('files', $files);
 		} catch(DesignNotFoundException $e) {
 			$this->forward('/admin/designs', new ErrorMessage('Design does not exist!'));
 		}
@@ -97,6 +117,10 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 		
 		return $files;
 	}
+
+	public function createForm() {
+		return new AdminDesignsFilesForm();
+	}
 	
 	/**
 	 * @override
@@ -104,14 +128,106 @@ class AdminDesignsFilesAction extends AdminBaseAction implements ActionContainer
 	protected function getBase() {
 		return '/admin/designs/' . $this->design->getName();
 	}
-	
-	public function execute() {
-		$path = $this->getSecurity()->getProfile() . '/designs/' . $this->design->getName() . '/templates';
-		$files = $this->scan($path);
 
+	public function succeed(Form $form) {
+		$error = false;
+		
+		foreach($form->toDelete as $file) {
+			if(!@unlink($this->getSecurity()->getProfile() . '/designs/' . $this->design->getName() . '/templates/' . URI::decode($file))) {
+				$error = true;
+			}
+		}
+
+		if($error) {
+			return new ErrorMessage('Not all selected files could have been deleted.');
+		} else {
+			return new Message('Selected file(s) deleted.');
+		}
+	}
+}
+
+class AdminDesignsCreateFileForm extends Form {
+
+	public $file;
+
+	public $contentOfFile;
+
+	public $confirmed = 'false';
+
+	private $profile;
+
+	private $design;
+
+	public function getPath() {
+		return $this->profile . '/designs/' . $this->design . '/templates/' . $this->file;
+	}
+
+	public function __construct($profile, $design) {
+		$this->profile = $profile;
+		$this->design = $design;
+	}
+
+	public function validate() {
+		if(file_exists($this->getPath())) {
+			$this->assertTrue(is_writable($this->getPath()), new ErrorMessage('You don\'t have the permission to create this file.'));
+		}
+
+		if(file_exists($this->getPath()) and $this->confirmed != 'true') {
+			$this->addError(new WarningMessage('There is already a file with this filename. Click again "Save changes" to override the file.'));
+			$this->confirmed = 'true';
+		} else {
+			$this->confirmed = 'false';
+		}
+	}
+}
+
+class AdminDesignsCreateFileAction extends AdminBaseFormAction {
+
+	private $design;
+
+	private $file;
+
+	protected function load() {
+		try {
+			$this->design = $this->getModel()->getDesigns($this->getRequest()->getPart(2));
+		} catch(DesignNotFoundException $e) {
+			$this->forward('/admin/designs', new ErrorMessage('Design does not exist!'));
+		}
 		$this->getDesign()->assign('design', $this->design);
-		$this->getDesign()->assign('files', $files);
-		$this->display('Admin/design.tpl');
+	}
+
+
+	public function getTemplate() {
+		return 'Admin/designNewFile.tpl';
+	}
+
+	protected function createForm() {
+		return new AdminDesignsCreateFileForm($this->getSecurity()->getProfile(), $this->design->getName());
+	}
+
+	/**
+	 * @override
+	 */
+	protected function getBase() {
+		return '/admin/designs/' . $this->design->getName();
+	}
+
+	protected function getReturn() {
+		return 'files';
+	}
+
+	protected function loadForm(Form $form) {
+		if(!is_writable($form->getPath())) {
+			$this->getRequest()->addMessage(new WarningMessage('You don\'t have the permission to edit this file.'));
+		}
+	}
+
+	public function succeed(Form $form) {
+		if(!file_put_contents($form->getPath(), HTML::decodeSpecialchars($form->contentOfFile))) {
+			return new ErrorMessage('Could not save file!');
+		} else {
+			return new Message('Changes saved!');
+		}
 	}
 }
 
@@ -191,6 +307,10 @@ class AdminDesignsFileAction extends AdminBaseFormAction {
 	 */
 	protected function getBase() {
 		return '/admin/designs/' . $this->design->getName();
+	}
+
+	protected function getReturn() {
+		return 'files';
 	}
 
 	protected function loadForm(Form $form) {

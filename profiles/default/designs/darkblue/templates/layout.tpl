@@ -41,5 +41,5 @@
 			, Powered by anomey {$version}
 		</p>
 	</div>
-	</body>
+ </body>
 </html>
