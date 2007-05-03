@@ -526,6 +526,16 @@ fieldset div.multiple {
 	height: 6.5em;	
 }
 
+fieldset div.multiple.large {
+	height: 13em;
+	width: 65em;
+}
+
+
+fieldset div.multiple.large select {
+	width: 48em;
+}
+
 fieldset div input,
 fieldset div select,
 fieldset div .datetime_select {

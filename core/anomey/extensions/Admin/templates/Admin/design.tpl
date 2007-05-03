@@ -11,7 +11,7 @@
  <ul id="actions">
 	{link trail="files/add"}<li><a href="{$href}" class="action add_file">Create file</a></li>
 	{/link} {link trail="files/copy"}
-	<li><a href="{$href}" class="action copy">Copy file</a></li>
+	<li><a href="{$href}" class="action copy">Copy files</a></li>
 	{/link}
 	<!-- <li><a href="{$href}" class="action upload">Upload file</a></li> -->
 </ul>

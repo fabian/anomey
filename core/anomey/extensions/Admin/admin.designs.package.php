@@ -30,7 +30,7 @@ class AdminDesignsAction extends AdminBaseAction implements ActionContainer {
 
 	public static function getActions() {
 		return array(
-			URI::CHARS . '*' => 'AdminDesignsDesignAction'
+		URI::CHARS . '*' => 'AdminDesignsDesignAction'
 		);
 	}
 
@@ -44,23 +44,23 @@ class AdminDesignsDesignAction extends AdminBaseAction implements ActionContaine
 
 	public static function getActions() {
 		return array(
-			'files' => 'AdminDesignsFilesAction',
-			'settings' => 'AdminDesignsSettingsAction'
+		'files' => 'AdminDesignsFilesAction',
+		'settings' => 'AdminDesignsSettingsAction'
 		);
-	}	
+	}
 
 	private $design;
-	
+
 	protected function load() {
 		$this->design = $this->getRequest()->getParameter(0);
 	}
-	
+
 	protected function getBase() {
 		return '/admin/designs/' . $this->design;
 	}
-	
+
 	public function execute() {
-		$this->forward('files');	
+		$this->forward('files');
 	}
 }
 
@@ -77,8 +77,9 @@ class AdminDesignsFilesAction extends AdminBaseFormAction implements ActionConta
 
 	public static function getActions() {
 		return array(
-			'add' => 'AdminDesignsCreateFileAction',
-			URI::CHARS . '*' => 'AdminDesignsFileAction'
+		'add' => 'AdminDesignsCreateFileAction',
+		'copy' => 'AdminDesignsCopyFileAction',
+		URI::CHARS . '*' => 'AdminDesignsFileAction'
 		);
 	}
 
@@ -87,11 +88,11 @@ class AdminDesignsFilesAction extends AdminBaseFormAction implements ActionConta
 	}
 
 	private $design;
-	
+
 	protected function load() {
 		try {
 			$this->design = $this->getModel()->getDesigns($this->getRequest()->getPart(2));
-			
+				
 			$path = $this->getSecurity()->getProfile() . '/designs/' . $this->design->getName() . '/templates';
 			$files = $this->scan($path);
 
@@ -101,27 +102,27 @@ class AdminDesignsFilesAction extends AdminBaseFormAction implements ActionConta
 			$this->forward('/admin/designs', new ErrorMessage('Design does not exist!'));
 		}
 	}
-	
+
 	private function scan($path, $add = '') {
 		$files = array();
-		
-		foreach (scandir($path, 1) as $name) {
+
+		foreach (scandir($path) as $name) {
 			if(substr($name, 0, 1) != '.') {
 				if(is_file($path . '/'. $name)) {
 					$files[] = array('path' => $add . $name, 'encoded' => URI::encode($add . $name), 'modified' =>  filemtime($path . '/' . $name));
 				} elseif (is_dir($path . '/' . $name)) {
-					$files = array_merge($files, $this->scan($path . '/'. $name, $name . '/'));
+					$files = array_merge($files, $this->scan($path . '/'. $name, $add . $name . '/'));
 				}
 			}
 		}
-		
+
 		return $files;
 	}
 
 	public function createForm() {
 		return new AdminDesignsFilesForm();
 	}
-	
+
 	/**
 	 * @override
 	 */
@@ -131,7 +132,7 @@ class AdminDesignsFilesAction extends AdminBaseFormAction implements ActionConta
 
 	public function succeed(Form $form) {
 		$error = false;
-		
+
 		foreach($form->toDelete as $file) {
 			if(!@unlink($this->getSecurity()->getProfile() . '/designs/' . $this->design->getName() . '/templates/' . URI::decode($file))) {
 				$error = true;
@@ -223,6 +224,12 @@ class AdminDesignsCreateFileAction extends AdminBaseFormAction {
 	}
 
 	public function succeed(Form $form) {
+		$dir = dirname($form->getPath());
+		
+		if(!@file_exists($dir)) {
+			mkdir($dir, 0755, true);
+		}
+		
 		if(!file_put_contents($form->getPath(), HTML::decodeSpecialchars($form->contentOfFile))) {
 			return new ErrorMessage('Could not save file!');
 		} else {
@@ -231,43 +238,142 @@ class AdminDesignsCreateFileAction extends AdminBaseFormAction {
 	}
 }
 
+class AdminDesignsCopyFileForm extends Form {
+
+	public $filesToCopy = array();
+
+	private $files;
+
+	public function __construct($files) {
+		$this->files = $files;
+	}
+
+	public function getFiles() {
+		return $this->files;
+	}
+
+	public function validate() {
+	}
+}
+
+class AdminDesignsCopyFileAction extends AdminBaseFormAction {
+
+	private $design;
+
+	protected function load() {
+		try {
+			$this->design = $this->getModel()->getDesigns($this->getRequest()->getPart(2));
+		} catch(DesignNotFoundException $e) {
+			$this->forward('/admin/designs', new ErrorMessage('Design does not exist!'));
+		}
+		$this->getDesign()->assign('design', $this->design);
+	}
+
+
+	public function getTemplate() {
+		return 'Admin/designCopyFile.tpl';
+	}
+
+	protected function createForm() {
+		$path = 'core/anomey/extensions/Admin/templates';
+		$files = $this->scan($path);
+		return new AdminDesignsCopyFileForm($files);
+	}
+
+	/**
+	 * @override
+	 */
+	protected function getBase() {
+		return '/admin/designs/' . $this->design->getName();
+	}
+
+	protected function getReturn() {
+		return 'files';
+	}
+
+	protected function loadForm(Form $form) {
+	}
+
+	private function scan($path, $add = '') {
+		$files = array();
+
+		foreach (scandir($path) as $name) {
+			if(substr($name, 0, 1) != '.') {
+				if(is_file($path . '/'. $name)) {
+					$files[URI::encode($path . '/'. $name . ':' .  $add . $name)] = $add . $name;
+				} elseif (is_dir($path . '/' . $name)) {
+					$files = $files + $this->scan($path . '/'. $name, $add . $name . '/');
+				}
+			}
+		}
+
+		return $files;
+	}
+
+	public function succeed(Form $form) {
+		$error = false;
+
+		foreach ($form->filesToCopy as $file) {
+			list($path, $name) = split(':', URI::decode($file), 2);
+			
+			$target = $this->getSecurity()->getProfile() . '/designs/' . $this->design->getName() . '/templates/' . $name;
+				
+			$dir = dirname($target);
+			
+			if(!@file_exists($dir)) {
+				mkdir($dir, 0755, true);
+			}
+		
+			if (!@copy($path, $target)) {
+				$error = true;
+			}
+		}
+
+		if($error) {
+			return new WarningMessage('Not all file(s) could have been copied!');
+		} else {
+			return new Message('File(s) copied!');
+		}
+	}
+}
+
 class AdminDesignsFileForm extends Form {
 
 	public $file;
-	
+
 	public $contentOfFile;
-	
+
 	public $confirmed = 'false';
-	
+
 	private $profile;
-	
+
 	private $design;
-	
+
 	private $orig;
-	
+
 	public function getPath() {
 		return $this->profile . '/designs/' . $this->design . '/templates/' . $this->file;
 	}
-	
+
 	public function getOrig() {
 		return $this->orig;
 	}
-	
+
 	public function getOrigPath() {
 		return $this->profile . '/designs/' . $this->design . '/templates/' . $this->orig;
 	}
-	
+
 	public function __construct($profile, $design, $orig) {
 		$this->profile = $profile;
 		$this->design = $design;
 		$this->orig = $orig;
 	}
-	
+
 	public function validate() {
 		if(file_exists($this->getPath())) {
 			$this->assertTrue(is_writable($this->getPath()), new ErrorMessage('You don\'t have the permission to edit this file.'));
 		}
-		
+
 		if($this->file != $this->orig and file_exists($this->getPath()) and $this->confirmed != 'true') {
 			$this->addError(new WarningMessage('There is already a file with this filename. Click again "Save changes" to override the file.'));
 			$this->confirmed = 'true';
@@ -280,9 +386,9 @@ class AdminDesignsFileForm extends Form {
 class AdminDesignsFileAction extends AdminBaseFormAction {
 
 	private $design;
-	
+
 	private $file;
-	
+
 	protected function load() {
 		try {
 			$this->design = $this->getModel()->getDesigns($this->getRequest()->getPart(2));
@@ -292,7 +398,7 @@ class AdminDesignsFileAction extends AdminBaseFormAction {
 		$this->getDesign()->assign('design', $this->design);
 		$this->file = URI::decode($this->getRequest()->getPart(4));
 	}
-	
+
 
 	public function getTemplate() {
 		return 'Admin/designFile.tpl';
@@ -301,7 +407,7 @@ class AdminDesignsFileAction extends AdminBaseFormAction {
 	protected function createForm() {
 		return new AdminDesignsFileForm($this->getSecurity()->getProfile(), $this->design->getName(), $this->file);
 	}
-	
+
 	/**
 	 * @override
 	 */
@@ -337,32 +443,32 @@ class AdminDesignsFileAction extends AdminBaseFormAction {
 class AdminDesignsSettingsForm extends Form {
 
 	public $name = '';
-	
+
 	public $title = '';
-	
+
 	public $author = '';
-	
+
 	public $license = '';
-	
+
 	private $orig;
-	
+
 	private $designs = array();
-	
+
 	public function getOrig() {
 		return $this->orig;
 	}
-	
+
 	public function getDesigns() {
 		return $this->designs;
 	}
-	
+
 	public function __construct($orig, $designs) {
 		$this->orig = $orig;
 		$this->designs = $designs;
 	}
-	
+
 	public function validate() {
-		if($this->assertNotEmpty($this->name, new ErrorMessage('Please type in a name.'))) {		
+		if($this->assertNotEmpty($this->name, new ErrorMessage('Please type in a name.'))) {
 			if($this->name != $this->getOrig()) {
 				$this->assertNotInList($this->name, $this->designs, new ErrorMessage('There is already a design with this name.'));
 			}
@@ -374,7 +480,7 @@ class AdminDesignsSettingsForm extends Form {
 class AdminDesignsSettingsAction extends AdminBaseFormAction {
 
 	private $design;
-	
+
 	protected function load() {
 		try {
 			$this->design = $this->getModel()->getDesigns($this->getRequest()->getPart(2));
@@ -382,7 +488,7 @@ class AdminDesignsSettingsAction extends AdminBaseFormAction {
 			$this->forward('/admin/designs', new ErrorMessage('Design does not exist!'));
 		}
 		$this->getDesign()->assign('design', $this->design);
-	}	
+	}
 
 	public function getTemplate() {
 		return 'Admin/designSettings.tpl';
@@ -395,7 +501,7 @@ class AdminDesignsSettingsAction extends AdminBaseFormAction {
 	protected function createForm() {
 		return new AdminDesignsSettingsForm($this->design->getName(), array());
 	}
-	
+
 	/**
 	 * @override
 	 */
