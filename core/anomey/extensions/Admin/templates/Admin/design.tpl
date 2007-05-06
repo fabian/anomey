@@ -36,11 +36,15 @@
  <tbody>
  {foreach from=$files item=file}
  <tr{cycle values=", class=\"even\""}>
-  <td><input id="page{$page.id}" name="toDelete[]" type="checkbox"
+  <td><input id="file{$file.encoded}" name="toDelete[]" type="checkbox"
 				value="{$file.encoded}" /></td>
   <td>{$file.path}</td>
   <td>{$file.modified|date_format:"%Y-%m-%d %H:%M"}</td>
   <td>{link trail="files/`$file.encoded`"}<a href="{$href}" class="action edit">edit</a>{/link}</td>
+ </tr>
+ {foreachelse}
+ <tr}>
+  <td colspan="4">There are no files in this design.</td>
  </tr>
  {/foreach}
  </tbody>

@@ -91,16 +91,32 @@ class Design extends Smarty implements ArrayAccess {
 		return $this->name;
 	}
 	
+	public function setName($name) {
+		$this->name = $name;
+	}
+	
 	public function getTitle() {
 		return $this->title;
+	}
+	
+	public function setTitle($title) {
+		$this->title = $title;
 	}
 	
 	public function getAuthor() {
 		return $this->author;
 	}
 	
+	public function setAuthor($author) {
+		$this->author = $author;
+	}
+	
 	public function getLicense() {
 		return $this->license;
+	}
+	
+	public function setLicense($license) {
+		$this->license = $license;
 	}
 	
 	public function parseText($string) {

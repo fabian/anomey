@@ -26,17 +26,117 @@
  * or visit http://www.gnu.org/copyleft/gpl.html.
  */
 
-class AdminDesignsAction extends AdminBaseAction implements ActionContainer {
+class AdminDesignsForm extends Form {
+
+	public $toDelete = array();
+
+	public function validate() {
+		$this->assertTrue(count($this->toDelete) > 0, new ErrorMessage('Please select at least one design to delete.'));
+	}
+}
+
+class AdminDesignsAction extends AdminBaseFormAction implements ActionContainer {
 
 	public static function getActions() {
 		return array(
+		'add' => 'AdminDesignsAddAction',
 		URI::CHARS . '*' => 'AdminDesignsDesignAction'
 		);
 	}
 
-	public function execute() {
+	public function getTemplate() {
+		return 'Admin/designs.tpl';
+	}
+
+	protected function load() {
 		$this->getDesign()->assign('designs', $this->getModel()->getDesigns());
-		$this->display('Admin/designs.tpl');
+	}
+
+	public function createForm() {
+		return new AdminDesignsForm();
+	}
+
+	/**
+	 * @override
+	 */
+	protected function getBase() {
+		return '/admin/designs';
+	}
+
+	public function succeed(Form $form) {
+		$error = false;
+
+		foreach($form->toDelete as $design) {
+			if(!FileSytem::rmdir($this->getSecurity()->getProfile() . '/designs/' . $design)) {
+				$error = true;
+			}
+		}
+
+		if($error) {
+			return new ErrorMessage('Not all selected designs could have been deleted.');
+		} else {
+			return new Message('Selected design(s) deleted.');
+		}
+	}
+}
+
+class AdminDesignsAddForm extends Form {
+
+	public $title = '';
+
+	public $name = '';
+
+	public $author = '';
+
+	public $license = '';
+	
+	private $designs;
+	
+	public function __construct($designs) {
+		$this->designs = $designs;
+	}
+
+	public function validate() {
+		$this->assertNotEmpty($this->title, new ErrorMessage('Please type in a title.'));
+		if($this->assertNotEmpty($this->name, new ErrorMessage('Please type in a name.'))) {
+			if($this->assertRegEx($this->name, '/^' . FileSytem::CHARS . '*$/', new ErrorMessage('The name may consists only of letters, digits, hyphens and underlines.'))) {
+				$this->assertNotInList($this->name, $this->designs, new ErrorMessage('The name is already in use. Please type in another name.'));
+			}
+		}
+	}
+}
+
+class AdminDesignsAddAction extends AdminBaseFormAction {
+
+
+	public function getTemplate() {
+		return 'Admin/designAdd.tpl';
+	}
+
+	protected function createForm() {
+		return new AdminDesignsAddForm(array_keys($this->getModel()->getDesigns()));
+	}
+
+	protected function getReturn() {
+		return '/admin/designs';
+	}
+
+	protected function loadForm(Form $form) {
+	}
+
+	public function succeed(Form $form) {
+		$designPath = $this->getSecurity()->getProfile() . '/designs/' . $form->name;
+
+		@mkdir($designPath . '/templates', 0755, true);
+
+		$xml = XML :: create('design');
+		$xml->addChild('title', $form->title);
+		$authorElement = $xml->addChild('author');
+		$authorElement->addChild('name', $form->author);
+		$xml->addChild('license', $form->license);
+		$xml->save($designPath . '/design.xml');
+		
+		return new Message('Design created!');
 	}
 }
 
@@ -470,7 +570,9 @@ class AdminDesignsSettingsForm extends Form {
 	public function validate() {
 		if($this->assertNotEmpty($this->name, new ErrorMessage('Please type in a name.'))) {
 			if($this->name != $this->getOrig()) {
-				$this->assertNotInList($this->name, $this->designs, new ErrorMessage('There is already a design with this name.'));
+				if($this->assertRegEx($this->name, '/^' . FileSytem::CHARS . '*$/', new ErrorMessage('The name may consists only of letters, digits, hyphens and underlines.'))) {
+					$this->assertNotInList($this->name, $this->designs, new ErrorMessage('There is already a design with this name.'));
+				}
 			}
 		}
 		$this->assertNotEmpty($this->title, new ErrorMessage('Please type in a title.'));
@@ -517,11 +619,24 @@ class AdminDesignsSettingsAction extends AdminBaseFormAction {
 	}
 
 	public function succeed(Form $form) {
-		// TODO save design settings
+		$this->design->setTitle($form->title);
+		$this->design->setAuthor($form->author);
+		$this->design->setlicense($form->license);
+
+		$designPath = $this->getSecurity()->getProfile() . '/designs/' . $form->getOrig();
+
+		$xml = XML :: create('design');
+		$xml->addChild('title', $form->title);
+		$authorElement = $xml->addChild('author');
+		$authorElement->addChild('name', $form->author);
+		$xml->addChild('license', $form->license);
+		$xml->save($designPath . '/design.xml');
+		
 		if($form->name != $form->getOrig()) {
-			if(rename($this->getSecurity()->getProfile() . '/designs/' . $form->getOrig(), $this->getSecurity()->getProfile() . '/designs/' . $form->getOrig())) {
+			if(@rename($designPath, $this->getSecurity()->getProfile() . '/designs/' . $form->name)) {
+				$this->design->setName($form->name);
 			} else {
-				//error
+				$this->getRequest()->addMessage(new WarningMessage('Could not rename design folder.'));
 			}
 		}
 
