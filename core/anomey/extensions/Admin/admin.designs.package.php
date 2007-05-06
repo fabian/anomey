@@ -56,13 +56,6 @@ class AdminDesignsAction extends AdminBaseFormAction implements ActionContainer 
 		return new AdminDesignsForm();
 	}
 
-	/**
-	 * @override
-	 */
-	protected function getBase() {
-		return '/admin/designs';
-	}
-
 	public function succeed(Form $form) {
 		$error = false;
 
