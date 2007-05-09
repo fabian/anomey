@@ -132,7 +132,7 @@ abstract class Action implements WebAction {
 			$trail = Processor::resolveTrail($this->getBase(), $trail);
 		}
 
-		$this->getProcessor()->forward($this->getRequest(), $trail, $this->getRequest()->getMessages());
+		$this->getProcessor()->forward($this->getRequest(), $this->getResponse(), $trail, $this->getRequest()->getMessages());
 	}
 }
 

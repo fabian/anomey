@@ -269,26 +269,26 @@ class Processor extends LinkContainer {
 		$link->execute($this, $request, $response, $security);
 	}
 
-	public function refresh($request) {
-		$this->forward($request, $request->getTrail(), $request->getMessages());
+	public function refresh(Request $request, Response $response) {
+		$this->forward($request, $response, $request->getTrail(), $request->getMessages());
 	}
 
-	public function forward(Request $request, $trail, $messages = array (), $query = '', $fragment = '') {
+	public function forward(Request $request, Response $response, $trail, $messages = array (), $query = '', $fragment = '') {
 		$url = $this->makeURL($trail, $query . SID, $fragment);
 
-		$this->redirect($request, $url, $messages);
+		$this->redirect($request, $response, $url, $messages);
 	}
 	
 	/**
 	 * Redirects to an URL.
 	 */
-	public function redirect(Request $request, $url, $messages = array ()) {
+	public function redirect(Request $request, Response $response, $url, $messages = array ()) {
 		$session = $request->getSession();
 		$session->store('systemMessages', $messages);
 		$session->commit();
 
-		header('X-Powered-By: anomey/' . Anomey :: VERSION);
-		header('Location: ' . $url, true, 301);
+		$response->setHeader('X-Powered-By', 'anomey/' . Anomey :: VERSION);
+		$response->setHeader('Location', $url);
 	}
 
 	public function makeURL($trail, $query = '', $fragment = '') {
@@ -693,6 +693,8 @@ class Response extends Bean {
 	
 	private $body = '';
 	
+	private $headers = array();
+	
 	public function getContentType() {
 		return $this->contentType;
 	}
@@ -708,6 +710,18 @@ class Response extends Bean {
 	public function setBody($body) {
 		$this->body = $body;
 	}
+	
+	public function getHeaders() {
+		return $this->headers;
+	}
+	
+	public function setHeader($name, $value) {
+		$this->headers[$name] = $value;
+	}
+	
+    public function setRedirect($url) {
+        $this->setHeader('Location', $url);
+    }
 }
 
 ?>

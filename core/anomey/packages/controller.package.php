@@ -232,6 +232,10 @@ class Controller {
 			// Write out the response.
 			// -----------------------------
 
+			foreach($response->getHeaders() as $name => $value) {
+				header($name . ': ' . $value);
+			}
+			
 			header('Content-type: ' . $response->getContentType());
 			echo $response->getBody();
 		} catch (Exception $e) {
