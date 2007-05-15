@@ -398,6 +398,18 @@ class AdminSecurityPermissionsAction extends AdminBaseAction implements ActionCo
 
 class AdminSecurityPermissionsChangeForm extends Form {
 
+	/**
+	 * @var Model
+	 */
+	private $model;
+
+	/**
+	 * @var User
+	 */
+	private $user;
+
+	public $confirmed = 'false';
+
 	public $who = array();
 
 	public $users = array ();
@@ -420,13 +432,47 @@ class AdminSecurityPermissionsChangeForm extends Form {
 		return $this->permissions;
 	}
 
-	public function __construct($allUsers, $allGroups, $permissions) {
+	public function __construct(Model $model, User $user, $allUsers, $allGroups, $permissions) {
+		$this->model = $model;
+		$this->user = $user;
 		$this->allUsers = $allUsers;
 		$this->allGroups = $allGroups;
 		$this->permissions = $permissions;
 	}
 
 	public function validate() {
+		if($this->model instanceof Site) {
+			$found = false;
+
+			foreach($this->model->getPermissions() as $permission) {
+				if(Value::get($this->who[$permission->getName()], 'everyone') == 'everyone') {
+					$found = true;
+				} else {
+					foreach(Value::get($this->users[$permission->getName()], array()) as $id) {
+						if($id == $this->user->getId()) {
+							$found = true;
+							break;
+						}
+					}
+
+					if(!$found) {
+						foreach(Value::get($this->groups[$permission->getName()], array()) as $id) {
+							if($this->model->getSecurity()->getGroup($id)->hasUser($this->user)) {
+								$found = true;
+								break;
+							}
+						}
+					}
+				}
+			}
+				
+			if(!$found and $this->confirmed != 'true') {
+				$this->addError(new WarningMessage('Your about to remove yourself rights from the site. Click again "Save changes" to remove the rights.'));
+				$this->confirmed = 'true';
+			} else {
+				$this->confirmed = 'false';
+			}
+		}
 	}
 }
 
@@ -462,7 +508,7 @@ class AdminSecurityPermissionsChangeAction extends AdminBaseFormAction {
 			$permissions[] = $permission->getName();
 		}
 
-		$form = new AdminSecurityPermissionsChangeForm($allUsers, $allGroups, $permissions);
+		$form = new AdminSecurityPermissionsChangeForm($this->getModel(), $this->getRequest()->getUser(), $allUsers, $allGroups, $permissions);
 
 		return $form;
 	}
@@ -497,6 +543,8 @@ class AdminSecurityPermissionsChangeAction extends AdminBaseFormAction {
 
 
 	protected function succeed(Form $form) {
+		$wait = true;
+
 		foreach($this->page->getPermissions() as $permission) {
 			$permission->clear();
 

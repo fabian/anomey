@@ -30,6 +30,8 @@
    {/foreach}
 
    <div>
+    <input type="hidden" name="confirmed" id="confirmed" value="{$form.confirmed}" />
+    
     {submit value="Save changes"}
     {cancel}
    </div>
