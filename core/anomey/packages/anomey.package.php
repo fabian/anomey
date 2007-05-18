@@ -27,7 +27,7 @@
  */
 
 abstract class Anomey {
-	const VERSION = '2.1.0rc';
+	const VERSION = '2.1.0';
 }
 
 ?>

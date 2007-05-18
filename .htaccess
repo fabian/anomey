@@ -1,12 +1,15 @@
-##################################################
+####################################################################
 # Enable mod_rewrite in apache to use nice urls.
 #
-# If you are using Apache Alias, then provide
-# with RewriteBase the path to anomey.
-# e.g. if the url to the index.php is
-# http://example.org/cms/anomey/index.php
-# then set this: RewriteBase /cms/anomey
-##################################################
+# If you are using Apache Alias, then provide with RewriteBase 
+# the path to anomey. e.g. if the url to the index.php 
+# is http://example.org/cms/anomey/index.php then set this:
+# 
+# RewriteBase /cms/anomey
+#
+# For more information visit:
+# http://httpd.apache.org/docs/2.0/mod/mod_rewrite.html#rewritebase
+####################################################################
 
 <IfModule mod_rewrite.c>
     RewriteEngine on

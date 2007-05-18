@@ -3,8 +3,8 @@
 
 	<property name="version" value="2.1.0" />
 	<property name="build" value="build" />
-	<property name="excludes" value="profiles/**, build/**, build.xml, build-anomey.launch, .project" />
-	<property name="framework" value="core/anomey/extensions/Admin/**" />
+	<property name="excludes" value="profiles/**, build/**, .cache/**, build.xml, build-anomey.launch, .project, release-notes.txt, .projectOptions" />
+	<property name="framework" value="core/anomey/extensions/**, core/anomey/modules/**" />
 
 	<target name="init">
 		<mkdir dir="${build}" />
