@@ -518,11 +518,13 @@ class Site extends Model {
 			$home->setName('home');
 			$home->setTitle('Home');
 			$home->setHide(false);
+			$home->setDesign($this->getDesign());
 			$this->store->createObject($home);
 			$this->index[$home->getId()] = $home;
 			$home->setParent($this);
 			$home->setContent('Welcome to anomey. Log in with username "root" and password "root" and ' .
-					'change your username and password as soon as possible.');
+					'change your username and password as soon as possible (inside the Admin go to' . 
+					' "Security" » "Users" and click "edit" on the user "root").');
 			if($home instanceof SecurityObject and $this->store instanceof Security) {
 				$viewPermission = new Permission('view');
 				$viewPermission->setEveryone(true);
