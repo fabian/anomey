@@ -57,7 +57,9 @@ class News extends Module {
 	}
 
 	public function getLastModified() {
-		return $this->getPublications()->first()->first()->getPublication();
+		if($this->getPublications()->first() != false) {
+			return $this->getPublications()->first()->first()->getPublication();
+		}
 	}
 
 	private $preface = '';
