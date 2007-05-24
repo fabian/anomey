@@ -368,8 +368,14 @@ class AdminDesignsCopyFileAction extends AdminBaseFormAction {
 	}
 
 	protected function createForm() {
-		$path = 'core/anomey/extensions/Admin/templates';
-		$files = $this->scan($path);
+		$paths = array(
+			'core/anomey/extensions/Admin/templates',
+			'core/anomey/templates'
+		);
+		$files = array();
+		foreach($paths as $path) {
+			$files = array_merge($files, $this->scan($path));
+		}
 		return new AdminDesignsCopyFileForm($files);
 	}
 
