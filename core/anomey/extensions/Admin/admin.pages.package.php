@@ -296,7 +296,7 @@ class AdminPageCreateNewForm extends Form {
 	public $name = '';
 	public $parent = '';
 	public $display = 'show';
-	public $type = '';
+	public $type = 'Text';
 
 	private $elements;
 
