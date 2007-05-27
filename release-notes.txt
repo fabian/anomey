@@ -1,3 +1,8 @@
+anomey 2.1.3
+====================
+
+- fixed bug in news module
+
 anomey 2.1.1
 ====================
 
