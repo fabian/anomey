@@ -74,7 +74,7 @@ class JoinAction extends Action implements ProtectedAction {
 	
 	public function execute() {
 		$url = $this->getModel()->getUrl();
-		$this->getProcessor()->redirect($this->getRequest(), $url);
+		$this->getProcessor()->redirect($this->getRequest(), $this->getResponse(), $url);
 	}
 }
 
