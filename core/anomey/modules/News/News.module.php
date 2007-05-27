@@ -349,7 +349,7 @@ class NewsAdminEditEntryAction extends AbstractAdminFormAction {
 	public function succeed(Form $form) {
 		$publication = $form->publicationDate['Year'] . '-' . $form->publicationDate['Month'] . '-' . $form->publicationDate['Day'] . 'T' . $form->publicationTime['Hour'] . ':' . $form->publicationTime['Minute'] . ':00';
 
-		$entry = new NewsEntry($this->entry->getId(), $form->title, $form->contentOfEntry, $publication, $this->getRequest()->getUser());
+		$entry = new NewsEntry($this->entry->getId(), $form->title, $this->entry->getName(), $form->contentOfEntry, $publication, $this->entry->getCreated(), $this->getRequest()->getUser());
 		$this->getModel()->update($entry);
 		$this->getModel()->save();
 
