@@ -1,5 +1,9 @@
 {layout template="Admin/layout.tpl" title="Overview"}
 
+{capture assign="header"}
+<script type="text/javascript" src="{resource file="javascripts/upgrade.js"}"></script>
+{/capture}
+
 <div id="overview">
  <p><a href="http://anomey.ch/">anomey</a> is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by

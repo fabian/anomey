@@ -26,15 +26,15 @@
  * or visit http://www.gnu.org/copyleft/gpl.html.
  */
 
-abstract class Anomey {
-	const VERSION = '2.1.3';
+
+class UpdateAction extends Action {
 	
-	const UPDATE_URL = 'http://anomey.ch/version';
-	
-	public static function isNewVersionAvailable() {
-		$current = file_get_contents(self::UPDATE_URL);
-		
-		return version_compare($current, self::VERSION, '>');
+	public function execute() {
+		if(Anomey::isNewVersionAvailable()) {
+			echo 'true';
+		} else {
+			echo 'false';
+		}
 	}
 }
 

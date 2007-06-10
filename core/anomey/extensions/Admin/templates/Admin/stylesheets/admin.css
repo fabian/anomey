@@ -425,6 +425,25 @@ a.action.upload {
 	padding-bottom: 0.5em;
 }
 
+#messages li.info,
+#messages li.warning,
+#messages li.error {
+	background-repeat: no-repeat;
+	padding-left: 20px;
+}
+
+#messages li.info {
+	background-image: url("../images/icons/message/info.png");
+}
+
+#messages li.warning {
+	background-image: url("../images/icons/message/warning.png");
+}
+
+#messages li.error {
+	background-image: url("../images/icons/message/error.png");
+}
+
 form {
 	clear: both;
 	margin-bottom: 1.5em;	

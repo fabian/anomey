@@ -3,6 +3,7 @@ anomey 2.1.4
 
 - session.use_only_cookies is now always set to active (if possible)
 - upgraded mootools to v1.11 and slimbox to v1.4
+- Issue #23: added check for new version
 
 anomey 2.1.3
 ====================

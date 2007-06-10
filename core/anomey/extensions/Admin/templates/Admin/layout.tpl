@@ -6,8 +6,9 @@
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <link rel="stylesheet" type="text/css" href="{resource file="stylesheets/admin.css"}" />
     <!--[if IE]><script type="text/javascript" src="{resource file="javascripts/ie.js"}"></script><![endif]-->
+    <script type="text/javascript" src="{resource file="javascripts/mootools.v1.11.js"}"></script>
     <script type="text/javascript" src="{resource file="javascripts/questions.js"}"></script>
-    <script type="text/javascript" src="{resource file="javascripts/sorttable.js"}"></script>
+    {$header}
 </head>
 <body>
 
@@ -48,14 +49,12 @@
         {/if}
         
         {$actions}
-	
-        {if count($request.messages) > 0}		
+		
 		<ul id="messages">
 			{foreach from=$request.messages item=message}
-			<li><img src="{resource file="images/icons/message/`$message.type`.png}" width="16" height="16" />{$message.value}</li>
+			<li class="{$message.type}">{$message.value}</li>
 			{/foreach}
 		</ul>
-		{/if}
 		
 		{$content}
 		

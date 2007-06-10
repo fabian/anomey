@@ -172,6 +172,7 @@ class Processor extends LinkContainer {
 		$this->add('login', new SiteLink($site, 'Login', true, 'LoginAction'));
 		$this->add('logout', new SiteLink($site, 'Logout', true, 'LogoutAction'));
 		$this->add('trusted', new SiteLink($site, 'Enter password', true, 'TrustedAction'));
+		$this->add('update', new SiteLink($site, 'Update', true, 'UpdateAction'));
 
 		$paths = array (
 			'core/anomey/extensions',
