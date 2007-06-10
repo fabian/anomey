@@ -21,6 +21,7 @@
 
 #lbImage {
 	border: 10px solid #fff;
+	background-repeat: no-repeat;
 }
 
 #lbPrevLink, #lbNextLink {

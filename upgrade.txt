@@ -1,0 +1,2 @@
+To upgrade to a never version of anomey simply
+copy the downloaded files in your anomey folder.
