@@ -35,6 +35,9 @@ class Session {
     }
 
     public function __construct() {
+    	// For security reasons use only cookies to store the session id
+		ini_set('session.use_only_cookies', 1);
+    	
         session_name('sid');
         session_start();
 
