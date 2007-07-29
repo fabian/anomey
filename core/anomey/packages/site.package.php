@@ -592,7 +592,7 @@ class Site extends Model {
 		$xml = XML :: create('site');
 		$xml->addAttribute('id', $this->getId());
 		$xml->addAttribute('title', $this->getTitle());
-		if($this->getDesign()->getName() != '') {
+		if($this->getDesign()) {
 			$xml->addAttribute('design', $this->getDesign()->getName());
 		}
 

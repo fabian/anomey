@@ -1,5 +1,5 @@
 ####################################################################
-# Enable mod_rewrite in apache and uncomment the following
+# Enable mod_rewrite in Apache and uncomment the following
 # settings to use nice urls.
 #
 # If you are using Apache Alias, then provide with RewriteBase 

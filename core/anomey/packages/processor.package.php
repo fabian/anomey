@@ -110,7 +110,7 @@ class Processor extends LinkContainer {
 	/**
 	 * Trail to the access denied page.
 	 */
-	private $accessDeniedTrail = '';
+	private $accessDeniedTrail = '/access-denied';
 
 	public function getAccessDeniedTrail() {
 		return $this->accessDeniedTrail;
@@ -123,7 +123,7 @@ class Processor extends LinkContainer {
 	/**
 	 * Trail to the page not found page.
 	 */
-	private $pageNotFoundTrail = '';
+	private $pageNotFoundTrail = '/not-found';
 
 	public function getPageNotFoundTrail() {
 		return $this->pageNotFoundTrail;
