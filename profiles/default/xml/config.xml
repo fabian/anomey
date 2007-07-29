@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<site debug="true">
+<site>
   <specialTrails>
     <home>/home</home>
     <accessDenied>/access-denied</accessDenied>
