@@ -67,7 +67,7 @@ class LinkContainer extends Bean {
 				}
 			}
 		}
-		throw new LinkNotFoundException('Link with pattern "' . $pattern . '" not found.');
+		throw new LinkNotFoundException('Link with pattern "' . $name . '" not found.');
 	}
 
 	public function add($name, Link $link) {

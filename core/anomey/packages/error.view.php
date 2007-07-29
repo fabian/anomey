@@ -1,3 +1,4 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -32,6 +33,7 @@ h1, h2, h3, h4, h5, h6 {
 <body>
 <h1>Error occured</h1>
 
+<?php if($debug_enabled): ?>
 <h2>Trace</h2>
 
 <p class="block background"><samp> <?php echo get_class($e); ?>:&nbsp;<?php echo $e->getMessage(); ?><br />
@@ -45,10 +47,16 @@ h1, h2, h3, h4, h5, h6 {
 
 <p class="block"><samp> <?php echo htmlentities($code); ?> </samp></p>
 
-<p>You can see the trace and the output because debugging is enabled. Set <code>enabled=false</code>
-in «conf/debug.properties» to hide the trace for security reasons.</p>
-
 <hr/>
+
+<p>You can see the trace and the output because debugging is enabled. Set <code>enabled=false</code>
+in «conf/debug.ini» to hide the trace for security reasons.</p>
+
+<?php else: ?>
+
+<p>Debugging has been disabled inside «conf/debug.ini».</p>
+
+<?php endif; ?>
 
 <p>anomey <?php echo Anomey::VERSION; ?></p>
 </body>

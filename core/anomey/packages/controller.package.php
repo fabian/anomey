@@ -49,6 +49,8 @@ class Controller {
 	private $profile;
 	
 	public function __construct($profile, $base) {
+		$debug_enabled = false;
+		
 		try {
 			ob_start();
 			
@@ -65,11 +67,14 @@ class Controller {
 			// Create config folder.
 			// -----------------------------
 			$this->createProfileFolder('config', true);
-			file_put_contents($profile . '/config/debug.ini', 'enabled=false');
+			if(!is_readable($profile . '/config/debug.ini')) {
+				file_put_contents($profile . '/config/debug.ini', "enabled=false\n");
+			}
 			
 			$debug = Configuration::load($profile . '/config/debug.ini');
+			$debug_enabled = $debug->enabled !== '';
 			
-			$errorhandler = new ErrorHandler($debug->enabled);
+			$errorhandler = new ErrorHandler($debug_enabled);
 			set_error_handler(array($errorhandler, 'handle'));
 	
 			// -----------------------------
@@ -240,7 +245,7 @@ class Controller {
 			$code = ob_get_clean();
 			include 'error.view.php';
 		}
-		ob_end_flush();
+		while(@ob_end_flush());
 	}
 	
 	private static function createFolder($name, $protected = false) {
