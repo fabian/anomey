@@ -156,12 +156,11 @@ class Controller {
 			$method = $_SERVER['REQUEST_METHOD'];
 	
 			// Trick out a CGI bug
-			if (isset ($_SERVER['PATH_INFO'])) {
-				if ($_SERVER['PATH_INFO'] == '' AND isset ($_SERVER['ORIG_PATH_INFO'])) {
-					$_SERVER['PATH_INFO'] = $_SERVER['ORIG_PATH_INFO'];
-				} elseif ($_SERVER['PATH_INFO'] == '') {
-					$_SERVER['PATH_INFO'] = '/';
-				}
+			$_SERVER['PATH_INFO'] = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '';
+			if ($_SERVER['PATH_INFO'] == '' AND isset ($_SERVER['ORIG_PATH_INFO'])) {
+				$_SERVER['PATH_INFO'] = $_SERVER['ORIG_PATH_INFO'];
+			} elseif ($_SERVER['PATH_INFO'] == '') {
+				$_SERVER['PATH_INFO'] = '/';
 			}
 	
 			// Find out the trail.
