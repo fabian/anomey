@@ -180,6 +180,8 @@ abstract class FormAction extends Action {
 	}
 
 	protected function display($message = null) {
+		// TODO check compability Action::display
+		
 		if ($message != null) {
 			$this->getRequest()->addMessage($message);
 		}

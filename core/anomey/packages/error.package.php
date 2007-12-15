@@ -33,15 +33,41 @@ class ErrorHandler {
 	}
 
 	public function handle($severity, $message, $file, $line) {
-		if (error_reporting() != 0 and $this->debug) {
-			if(!(E_NOTICE & $severity)) {
-				// ignore
-			} elseif(!(E_WARNING & $severity)) {
-				echo '<br/><strong>Warning:</strong> ' . $message . ' <em>in file ' . $file . ':' . $line . '</em>';
-			} else {
+		switch ($severity) {
+			case E_USER_ERROR:
+			case E_ERROR:
+			case E_COMPILE_ERROR:
 				throw new ErrorException($message, 0, $severity, $file, $line);
-			}
+				break;
+
+			case E_STRICT:
+				// ignore
+				break;
+
+			default:
+				if (error_reporting() == 0) {
+					$types = array (
+					E_WARNING        => 'Warning',
+					E_PARSE          => 'Parsing error',
+					E_NOTICE         => 'Notice',
+					E_CORE_ERROR     => 'Core error',
+					E_CORE_WARNING   => 'Core warning',
+					E_COMPILE_WARNING => 'Compile warning',
+					E_USER_WARNING   => 'User warning',
+					E_USER_NOTICE    => 'User notice',
+					E_RECOVERABLE_ERROR  => 'Recoverable error'
+					);
+
+					$type = isset($types[$severity]) ? $types[$severity] : 'Unknown error';
+
+					if($this->debug) {
+						echo '<br/><strong>' . $type . ':</strong> ' . $message . ' <em>in file ' . $file . ':' . $line . '</em>';
+					}
+				}
+				break;
 		}
+
+		return true;
 	}
 }
 

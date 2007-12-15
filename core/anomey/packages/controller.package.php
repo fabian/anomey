@@ -244,7 +244,9 @@ class Controller {
 			$code = ob_get_clean();
 			include 'error.view.php';
 		}
-		while(@ob_end_flush());
+		while (ob_get_level() > 0) {
+			ob_end_flush();
+		}
 	}
 	
 	private static function createFolder($name, $protected = false) {

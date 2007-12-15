@@ -366,6 +366,7 @@ class Processor extends LinkContainer {
 	 * @param LinkContainer $link
 	 * @param string $trail
 	 * @param array $orig	The original trail (as array) to the searched link. (optional)
+	 * @return Link
 	 */
 	public static function findLink(LinkContainer $linkcontainer, $trail, $orig = null) {
 		if(substr($trail, 0, 1) == '/') {
