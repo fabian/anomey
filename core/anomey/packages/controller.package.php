@@ -156,15 +156,13 @@ class Controller {
 			$method = $_SERVER['REQUEST_METHOD'];
 	
 			// Trick out a CGI bug
-			$_SERVER['PATH_INFO'] = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '';
-			if ($_SERVER['PATH_INFO'] == '' AND isset ($_SERVER['ORIG_PATH_INFO'])) {
-				$_SERVER['PATH_INFO'] = $_SERVER['ORIG_PATH_INFO'];
-			} elseif ($_SERVER['PATH_INFO'] == '') {
-				$_SERVER['PATH_INFO'] = '/';
+			$trail = isset($_SERVER['PATH_INFO']) ? $_SERVER['PATH_INFO'] : '';
+			if ($trail == '' AND isset ($_SERVER['ORIG_PATH_INFO'])) {
+				$trail = $_SERVER['ORIG_PATH_INFO'];
 			}
-	
-			// Find out the trail.
-			$trail = Value :: get($_SERVER['PATH_INFO'], '/');
+			if ($trail == '') {
+				$trail = '/';
+			}
 	
 			// Merge the parameters passed over POST and GET.
 			$parameters = array_merge($_POST, $_GET);

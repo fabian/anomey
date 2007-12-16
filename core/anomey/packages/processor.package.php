@@ -229,9 +229,16 @@ class Processor extends LinkContainer {
 			try {
 				$this->executeAction($request, $response, $this->getPageNotFoundTrail());
 			} catch (ActionNotFoundException $ee) {
-				exit ('Could not find the error action, defined in "' . $this->configuration . '"!');
+				throw new Exception('Found neither the requested page "' . htmlentities($request->getTrail()) . '" nor the page not found "' . 
+					htmlentities($this->getPageNotFoundTrail()) . '", defined in "' . $this->configuration . '"! ' . 
+					'Please go to the <a href="' . $this->makeRelativeURL('/admin/pages/') . '">pages admin</a> and create this pages or ' . 
+					'define existing pages for "Home page" and "Page not found" in the ' . 
+					'<a href="' . $this->makeRelativeURL('/admin/settings/') . '">settings admin</a>.');
 			} catch (AccessDeniedException $ee) {
-				exit ('Cannot access the error action, defined in "' . $this->configuration . '"!');
+				throw new Exception('Can neither find the requested page "' . htmlentities($request->getTrail()) . '" nor access the page ' . 
+					'not found "' . htmlentities($this->getPageNotFoundTrail()) . '", defined in "' . $this->configuration . '"! Please go to the ' . 
+					'<a href="' . $this->makeRelativeURL('/admin/settings/') . '">settings admin</a> and set "Page not found"" to a page which is ' . 
+					'accessible for everyone.');
 			}
 		} catch (AccessDeniedException $e) {
 			if ($request->getUser() == null) {
@@ -240,9 +247,16 @@ class Processor extends LinkContainer {
 				try {
 					$this->executeAction($request, $response, $this->getAccessDeniedTrail());
 				} catch (ActionNotFoundException $ee) {
-					exit ('Could not find the access-denied trail, defined in "' . $this->configuration . '"!');
+					throw new Exception('Could neither find the requested page "' . htmlentities($request->getTrail()) . '" nor access the ' . 
+						'access denied page "' . htmlentities($this->getAccessDeniedTrail()) . '", defined in "' . $this->configuration . '"! ' . 
+						'Please go to the <a href="' . $this->makeRelativeURL('/admin/pages/') . '">pages admin</a> and create this pages or ' . 
+						'define existing pages for "Home page" and "Access denied" in the ' . 
+						'<a href="' . $this->makeRelativeURL('/admin/settings/') . '">settings admin</a>.');
 				} catch (AccessDeniedException $ee) {
-					exit ('Cannot access the access-denied trail, defined in "' . $this->configuration . '"!');
+					throw new Exception('Could neither find the requested page "' . htmlentities($request->getTrail()) . '" nor access the ' . 
+						'access denied page "' . htmlentities($this->getAccessDeniedTrail()) . '", defined in "' . $this->configuration . '"! ' . 
+						'Please go to the <a href="' . $this->makeRelativeURL('/admin/settings/') . '">settings admin</a> and set "Access denied" ' . 
+						' to a page which is accessible for everyone');
 				}
 			}
 		} catch (TrustedUserRequiredException $e) {
