@@ -45,17 +45,18 @@ class ErrorHandler {
 				break;
 
 			default:
-				if (error_reporting() == 0) {
+				$severity = $severity & error_reporting();
+				if ($severity != 0) {
 					$types = array (
-					E_WARNING        => 'Warning',
-					E_PARSE          => 'Parsing error',
-					E_NOTICE         => 'Notice',
-					E_CORE_ERROR     => 'Core error',
-					E_CORE_WARNING   => 'Core warning',
-					E_COMPILE_WARNING => 'Compile warning',
-					E_USER_WARNING   => 'User warning',
-					E_USER_NOTICE    => 'User notice',
-					E_RECOVERABLE_ERROR  => 'Recoverable error'
+						E_WARNING => 'Warning',
+						E_PARSE => 'Parsing error',
+						E_NOTICE => 'Notice',
+						E_CORE_ERROR => 'Core error',
+						E_CORE_WARNING => 'Core warning',
+						E_COMPILE_WARNING => 'Compile warning',
+						E_USER_WARNING => 'User warning',
+						E_USER_NOTICE => 'User notice',
+						E_RECOVERABLE_ERROR => 'Recoverable error'
 					);
 
 					$type = isset($types[$severity]) ? $types[$severity] : 'Unknown error';
