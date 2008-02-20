@@ -75,6 +75,7 @@ class Gallery extends Module {
 	}
 	
 	public function load() {
+
 		try {
 			$this->sxml = $this->getXml();
 		}
@@ -318,25 +319,30 @@ class Gallery extends Module {
 	 * @param $settings array which includes the size of an image and if it should be croped or not
 	 */
 	private function prepareImageGD(ImageItem $item, $settings){
-		$source = $item->getSource();
+		$remote = $item->getSource();
+		$local = $item->getCache(null);
+		
 		$cache = $item->getCache($settings);
 		
-		$image_info = getimagesize($source);
+		if(!file_exists($local))
+			copy($remote, $local);
+		
+		$image_info = getimagesize($local);
 		if(!$image_info){
 			throw new ImportException('Could not load image.');
 		}
 		
 		switch ($image_info['mime']) {
 			case 'image/gif':
-				$image = imagecreatefromgif($source);
+				$image = imagecreatefromgif($local);
 				$item->setType('gif');
 				break;
 			case 'image/jpeg':
-				$image = imagecreatefromjpeg($source);
+				$image = imagecreatefromjpeg($local);
 				$item->setType('jpeg');
 				break;
 			case 'image/png':
-				$image = imagecreatefrompng($source);
+				$image = imagecreatefrompng($local);
 				$item->setType('png');
 				break;
 			default:
@@ -491,6 +497,7 @@ class GalleryAction extends Action implements ActionContainer, ProtectedAction {
 	}
 	
 	public function execute() {
+		
 		$this->getModel()->setStorage($this->getProcessor()->getURL()->getPath());
 		$this->getModel()->selectItem($this->getRequest()->getParameters());
 		
@@ -514,8 +521,9 @@ class GalleryAction extends Action implements ActionContainer, ProtectedAction {
 		$this->getDesign()->assign('gallerypath', $this->getModel()->getGalleryPath());
 		$this->getDesign()->assign('settings', $this->getModel()->getSettings());
 		$this->getDesign()->assign('gallery', $this->getModel()->getItem());
-
+		
 		$this->display('Gallery/gallery.tpl');
+
 	}
 }
 

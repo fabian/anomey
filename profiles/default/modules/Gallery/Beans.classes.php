@@ -145,7 +145,7 @@ abstract class Component extends Bean {
 	
 	protected $sxml;
 	
-	public function __construct($module, $parent, SimpleXMLElement $sxml){
+	public function __construct(Gallery $module, $parent, SimpleXMLElement $sxml){
 		$this->module = $module;
 		if($parent)
 			$this->parent = $parent;
@@ -239,7 +239,7 @@ abstract class Composite extends Component {
 	protected $children = array();
 	private $deep;
 	
-	public function __construct($module, $parent, SimpleXMLElement $sxml){
+	public function __construct(Gallery $module, $parent, SimpleXMLElement $sxml){
 		parent::__construct($module, $parent, $sxml);
 		
 	}
@@ -342,7 +342,7 @@ abstract class Composite extends Component {
 	
 abstract class Leaf extends Component {
 
-	public function __construct($module, $parent, SimpleXMLElement $sxml){
+	public function __construct(Gallery $module, $parent, SimpleXMLElement $sxml){
 		parent::__construct($module, $parent, $sxml);
 	}
 	

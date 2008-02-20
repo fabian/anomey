@@ -4,7 +4,7 @@
  * anomey 2.1 - content management
  * ================================
  * 
- * Copyright © 2006, 2007 - Adrian Egloff <adrian@anomey.ch>, 
+ * Copyright �� 2006, 2007 - Adrian Egloff <adrian@anomey.ch>, 
  * Cyril Gabathuler <cyril@anomey.ch> and Fabian Vogler <fabian@anomey.ch>
  * 
  * This file is part of anomey. For more information about anomey
@@ -31,13 +31,34 @@ class ImageItem extends Leaf {
 	protected $thumb;
 	protected $image;
 	
-	public function __construct($module, $parent, SimpleXMLElement $sxml){
+	public function __construct(Gallery $module, $parent, SimpleXMLElement $sxml){
 		parent::__construct($module, $parent, $sxml);
 		
 		$this->source = (string) $this->sxml['source'];
 		$this->type = (string) $this->sxml['type'];
 		
+		
 		if($this->type == ""){
+			$ending = strtolower(substr($this->source, strrpos($this->source, '.')+1));
+			switch ($ending) {
+				case 'gif':
+					$this->type = 'gif';
+					break;
+				case 'jpeg':
+				case 'jpg':
+					$this->type = 'jpeg';
+					break;
+				case 'png':
+					$this->type = 'png';
+					break;
+				default:
+					throw new ImportException("Unknown image format.");
+			}
+			
+			
+			// better but slower method
+			// the whole image will be downloaded to get the image type
+			/*
 			$image_info = getimagesize($this->source);
 			if(!$image_info){
 				throw new ImportException("Could not load image.");
@@ -54,8 +75,9 @@ class ImageItem extends Leaf {
 					break;
 				default:
 					throw new ImportException("Unknown image format.");
-			}
+			}*/
 		}
+		
 	}
 	
 	public function setType($type){
@@ -84,7 +106,10 @@ class ImageItem extends Leaf {
 	}
 	
 	private function getHash($settings){
-		return $this->class.'__'.$this->id.'__'.$settings['width'].'x'.$settings['height'].'__CROP'.($settings['crop']?'true':'false').'.'.$this->type;
+		if($settings == null)
+			return $this->class.'__'.$this->id.'__ORIGINAL.'.$this->type;
+		else
+			return $this->class.'__'.$this->id.'__'.$settings['width'].'x'.$settings['height'].($settings['crop']?'__CROPPED':'').'.'.$this->type;
 	}
 	
 	private function getImage($settings){
