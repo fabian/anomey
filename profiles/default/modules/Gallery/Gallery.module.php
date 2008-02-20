@@ -110,10 +110,12 @@ class Gallery extends Module {
 		// gd check
 
 		$this->state->tools['gd'] = function_exists('gd_info');
-
+		
 		$this->state->formats['image/gif'] = function_exists('imagecreatefromgif');
 		$this->state->formats['image/jpeg'] = function_exists('imagecreatefromjpeg');
 		$this->state->formats['image/png'] = function_exists('imagecreatefrompng');
+		$this->state->formats['image/svg'] = false;
+		$this->state->formats['movie/avi'] = false;
 		
 		// image magick check
 		
@@ -664,7 +666,7 @@ class GalleryAdminStateAction extends AbstractAdminAction {
 	
 	public function execute() {
 		$this->getDesign()->assign('state', $this->getModel()->getState());
-		
+		print_r($this->getModel()->getState());
 		$this->display('Admin/Gallery/state.tpl');
 	}
 }
