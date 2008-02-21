@@ -46,10 +46,6 @@ class FlickrImport extends Import {
 	
 	
 	public function doit(){
-		$root = $this->module->getRoot();
-		if(!isset($root))
-			throw new ImportException("No rootitem.");
-			
 		
 		if(!isset($this->item))
 			throw new ImportException("Parentitem not found.");

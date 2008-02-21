@@ -19,9 +19,9 @@
 	{if $rows == 0 || ($smarty.foreach.items.iteration > $start && $smarty.foreach.items.iteration - 1 < $end)}
 		<li>
 			{if $item.class == "Image"}
-				<a href="{$item.item}" rel="lightbox[{$gallery.id}]" class="item"><img src="{$item.thumb}" /></a>
+				<a href="{$item.item}" rel="lightbox[{$gallery.id}]" class="item"><img src="{$item.thumb}" width="{$settings.thumbSettings.width}" height="{$settings.thumbSettings.height}" /></a>
 			{elseif $item.class == "Gallery"}
-				{link trail="" id=$item.id}<a href="{$href}" class="item"><img src="{$item.thumb}" /></a>
+				{link trail="" id=$item.id}<a href="{$href}" class="item"><img src="{$item.thumb}" width="{$settings.thumbSettings.width}" height="{$settings.thumbSettings.height}" /></a>
 				<div class="detail">
 					<a href="{$href}" class="title">{$item.title}</a>
 					<p class="minor">{$item.childrenSize} Pictures</p>
@@ -34,7 +34,7 @@
 		{/if}
 	{else}
 		{if $item.class == "Image"}
-			<a href="{$item.item}" class="hide" rel="lightbox[{$gallery.id}]" class="item"><img src="{$item.thumb}" /></a>
+			<a href="{$item.item}" class="hide" rel="lightbox[{$gallery.id}]" class="item"><img src="{$item.thumb}" width="{$settings.thumbSettings.width}" height="{$settings.thumbSettings.height}" /></a>
 		{/if}
 	{/if}
 {foreachelse}

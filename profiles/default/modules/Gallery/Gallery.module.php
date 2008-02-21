@@ -51,6 +51,7 @@
 include_once('Beans.classes.php');
 include_once('GalleryItem.class.php');
 include_once('ImageItem.class.php');
+include_once('ImageManipulation.classes.php');
 
 /**
  * This is the model of the gallery module
@@ -89,8 +90,10 @@ class Gallery extends Module {
 		
 		$this->checkState();
 		$this->loadSettings();
+		$this->setStorage(null);
+		//$this->loadImports();
 		$this->loadItems();
-		$this->loadImports();
+		
 		
 		/*	// sample import function for first and second import
 		try{
@@ -108,18 +111,17 @@ class Gallery extends Module {
 		$this->state = new State();
 		
 		// gd check
-
-		$this->state->tools['gd'] = function_exists('gd_info');
 		
-		$this->state->formats['image/gif'] = function_exists('imagecreatefromgif');
-		$this->state->formats['image/jpeg'] = function_exists('imagecreatefromjpeg');
-		$this->state->formats['image/png'] = function_exists('imagecreatefrompng');
-		$this->state->formats['image/svg'] = false;
-		$this->state->formats['movie/avi'] = false;
+		$this->state->tools['gd']['available'] = GDImageManipulation::available();
 		
-		// image magick check
+		$this->state->tools['gd']['formats'] = GDImageManipulation::mimeTypes();
 		
-		// cache check
+		
+		// fake check
+		$this->state->tools['fake']['available'] = FakeImageManipulation::available();
+		
+		$this->state->tools['fake']['formats'] = FakeImageManipulation::mimeTypes();
+		
 			
 	}
 	
@@ -159,9 +161,9 @@ class Gallery extends Module {
 	
 	public function addImport($importxml){
 		$class = (string) $importxml['class'].'Import';
-		if(file_exists('core'.DIRECTORY_SEPARATOR.'anomey'.DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'Gallery'.DIRECTORY_SEPARATOR.$class.'.class.php'))
+		if(file_exists($this->getSecurity()->getProfile().DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'Gallery'.DIRECTORY_SEPARATOR.$class.'.class.php'))
 			include_once($class . '.class.php');
-		
+	
 		if(class_exists($class)){
 			$import = new $class($importxml, $this);
 			if($import != null){
@@ -184,7 +186,7 @@ class Gallery extends Module {
 		 * Note: 	There can only be one TopLevel Item (and that is $xml->item[0]), other TopLevel items will be ignored
 		 */
 		
-		// load default Picasa/Flickr imports
+		// load default Picasa/Flickr imports if there is no item in the gallery
 		if(!isset($this->sxml->item[0])){
 			if(!isset($this->sxml->imports))
 				$imports = $this->sxml->addChild('imports');
@@ -194,8 +196,8 @@ class Gallery extends Module {
 			$import = $imports->addChild('import');
 			$import->addAttribute('class', 'Picasa');
 			$import->addAttribute('item', '10');
-			$import->addAttribute('rss', 'http://picasaweb.google.com/lh/rssAlbum?uname=adrian.egloff&aid=4984938126230224913');
-
+			$import->addAttribute('rss', 'http://picasaweb.google.com/data/feed/back_compat/user/adrian.egloff/albumid/4984938126230224913');
+			
 			$import = $imports->addChild('import');
 			$import->addAttribute('class', 'Flickr');
 			$import->addAttribute('item', '11');
@@ -214,9 +216,19 @@ class Gallery extends Module {
 			$gallery->addAttribute('class', 'Gallery');
 			$gallery->addAttribute('id', '11');
 			$gallery->addAttribute('title', 'Flickr Testgallery');
-
+			
+			
+			$this->root = $this->loadItem(null, $root);
+			
+			$this->loadImports();
+			
+			foreach($this->imports as $import)
+				$import->doit();
+				
+			$this->save();
+			
 		}
-		
+
 		try {
 			$this->root = $this->loadItem(null, $this->sxml->item[0]);
 		}
@@ -243,7 +255,7 @@ class Gallery extends Module {
 	
 	public function loadItem($parentitem, SimpleXMLElement $sxml){
 		$class = (string) $sxml['class'].'Item';
-		if(file_exists($this->getSecurity()->getProfile() . '/modules/Gallery/'.$class.'.class.php'))
+		if(file_exists($this->getSecurity()->getProfile().DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'Gallery'.DIRECTORY_SEPARATOR.$class.'.class.php'))
 			include_once($class.'.class.php');
 		
 		if(class_exists($class)){
@@ -305,22 +317,14 @@ class Gallery extends Module {
 	}
 	
 	public function prepareImage(ImageItem $item, $settings){
-		if($this->state->tools['gd']){
-			$this->prepareImageGD($item, $settings);
+		
+		if(GDImageManipulation::available()){
+			$imageLibrary = new GDImageManipulation();
 		}
-		else{
-			//throw new ImportException('No graphic library available.');
+		else if(FakeImageManipulation::available()){
+			$imageLibrary = new FakeImageManipulation();
 		}
 		
-	}
-	
-	/**
-	 * This function prepares an image. It resizes the image to the given size and crops it if it has to.
-	 * 
-	 * @param ImageItem $item image which should be prepared
-	 * @param $settings array which includes the size of an image and if it should be croped or not
-	 */
-	private function prepareImageGD(ImageItem $item, $settings){
 		$remote = $item->getSource();
 		$local = $item->getCache(null);
 		
@@ -329,93 +333,8 @@ class Gallery extends Module {
 		if(!file_exists($local))
 			copy($remote, $local);
 		
-		$image_info = getimagesize($local);
-		if(!$image_info){
-			throw new ImportException('Could not load image.');
-		}
+		$imageLibrary->resizeImage($local, $cache, $settings['width'], $settings['height'], $settings['crop']);
 		
-		switch ($image_info['mime']) {
-			case 'image/gif':
-				$image = imagecreatefromgif($local);
-				$item->setType('gif');
-				break;
-			case 'image/jpeg':
-				$image = imagecreatefromjpeg($local);
-				$item->setType('jpeg');
-				break;
-			case 'image/png':
-				$image = imagecreatefrompng($local);
-				$item->setType('png');
-				break;
-			default:
-				throw new ImportException("Unknown image format.");
-		}
-		
-		$width_src = $image_info[0];
-		$height_src = $image_info[1];
-		
-		$width_dst = $settings['width'];
-		$height_dst = $settings['height'];
-		
-		if($width_src < $width_dst && $height_src < $height_dst){
-			$resized = $image;
-		}
-		else if(!$settings['crop']){
-			// resize only
-			if($width_src > $width_dst || $height_src > $height_dst){
-				if($width_dst / $height_dst < $width_src / $height_src){
-					$percent = $width_dst / $width_src;
-				}
-				else {
-					$percent = $height_dst / $height_src;
-				}
-			}
-			else{
-				$percent = 1;
-			}
-			
-			$width_calc = $width_src * $percent;
-			$height_calc = $height_src * $percent;
-			
-			$resized = imagecreatetruecolor($width_calc, $height_calc);
-			
-			imagecopyresampled($resized, $image, 0, 0, 0, 0, $width_calc, $height_calc, $width_src, $height_src);
-		}
-		else{
-			// resize and crop
-			$off_w = 0;
-			$off_h = 0;
-			
-			if($width_dst / $height_dst > $width_src / $height_src){
-				$percent = $width_dst / $width_src;
-				$off_h = $height_src - ($height_dst / $percent);
-			}
-			else {
-				$percent = $height_dst / $height_src;
-				$off_w = $width_src - ($width_dst / $percent);
-			}
-			
-			$width_calc = $width_src * $percent;
-			$height_calc = $height_src * $percent;
-			
-			$resized = imagecreatetruecolor($width_dst, $height_dst);
-			
-			imagecopyresampled($resized, $image, -($width_calc/2) + ($width_dst/2), -($height_calc/2) + ($height_dst/2), 0, 0, $width_calc, $height_calc, $width_src, $height_src);
-		}
-		
-		switch ($item->getType()) {
-			case 'gif':
-				imagegif($resized, $cache);
-				break;
-			case 'jpeg':
-				imagejpeg($resized, $cache);
-				break;
-			case 'png':
-				imagepng($resized, $cache);
-				break;
-			default:
-				throw new ImportException("Unknown image format.");
-		}
 	}
 
 	public function addGallery($title, $date, $parent){
@@ -471,6 +390,7 @@ class Gallery extends Module {
 		
 		
 		$this->store($sxml);
+		$this->sxml = $sxml;
 	}
 }
 
