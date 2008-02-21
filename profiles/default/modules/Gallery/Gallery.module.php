@@ -159,7 +159,7 @@ class Gallery extends Module {
 	
 	public function addImport($importxml){
 		$class = (string) $importxml['class'].'Import';
-		if(file_exists('./core/anomey/modules/Gallery/' . $class . '.class.php'))
+		if(file_exists('core'.DIRECTORY_SEPARATOR.'anomey'.DIRECTORY_SEPARATOR.'modules'.DIRECTORY_SEPARATOR.'Gallery'.DIRECTORY_SEPARATOR.$class.'.class.php'))
 			include_once($class . '.class.php');
 		
 		if(class_exists($class)){
@@ -226,8 +226,8 @@ class Gallery extends Module {
 	}
 	
 	public function setStorage($url_path){
-		$this->storage['local'] = $this->getSecurity()->getProfile() . '/media/'.$this->getId().'/galleries/';
-		$this->storage['cache'] = $this->getSecurity()->getProfile() . '/tmp/cache/'.$this->getId().'/';
+		$this->storage['local'] = $this->getSecurity()->getProfile().DIRECTORY_SEPARATOR.'media'.DIRECTORY_SEPARATOR.$this->getId().DIRECTORY_SEPARATOR.'galleries'.DIRECTORY_SEPARATOR;
+		$this->storage['cache'] = $this->getSecurity()->getProfile().DIRECTORY_SEPARATOR.'tmp'.DIRECTORY_SEPARATOR.'cache'.DIRECTORY_SEPARATOR.$this->getId().DIRECTORY_SEPARATOR;
 		$this->storage['web'] = $url_path. $this->getSecurity()->getProfile() . '/tmp/cache/'.$this->getId().'/';
 		
 		if(!file_exists($this->storage['cache'])){
@@ -236,7 +236,7 @@ class Gallery extends Module {
 		}
 		if(!file_exists($this->storage['local'])){
 			// create media-folder
-			mkdir($this->getSecurity()->getProfile() . '/media/'.$this->getId());
+			mkdir($this->getSecurity()->getProfile().DIRECTORY_SEPARATOR.'media'.DIRECTORY_SEPARATOR.$this->getId());
 			mkdir($this->storage['local']);
 		}
 	}
@@ -666,7 +666,7 @@ class GalleryAdminStateAction extends AbstractAdminAction {
 	
 	public function execute() {
 		$this->getDesign()->assign('state', $this->getModel()->getState());
-		print_r($this->getModel()->getState());
+		
 		$this->display('Admin/Gallery/state.tpl');
 	}
 }
@@ -903,7 +903,7 @@ class GalleryAdminAddImageAction extends AbstractAdminFormAction {
 			if(!$this->getModel()->checkFormat($_FILES['uploadimage']['type']))
 				return new WarningMessage('Your image format is not supportet. Whatch the state-page.');
 			
-			$folder = $this->getModel()->getMediaPath() . '/galleries/' . $form->parentid . '/';
+			$folder = $this->getModel()->getMediaPath().DIRECTORY_SEPARATOR.'galleries'.DIRECTORY_SEPARATOR.$form->parentid.DIRECTORY_SEPARATOR;
 			if(!file_exists($folder))
 				mkdir($folder);
 			if(move_uploaded_file($_FILES['uploadimage']['tmp_name'], $folder . basename($_FILES['uploadimage']['name']))) {
