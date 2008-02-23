@@ -3,7 +3,7 @@
 
 	<property name="version" value="2.1.5" />
 	<property name="build" value="build" />
-	<property name="excludes" value="profiles/**, build/**, .cache/**, build.xml, build-anomey.launch, .project, release-notes.txt, .projectOptions" />
+	<property name="excludes" value="profiles/**, build/**, .cache/**, build.xml, build-anomey.launch, .project, release-notes.txt, .settings/**" />
 	<property name="framework" value="core/anomey/extensions/**, core/anomey/modules/**" />
 
 	<target name="init">
